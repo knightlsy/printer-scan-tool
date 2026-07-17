@@ -26,14 +26,7 @@ from . import install as _install
 
 
 def _parse_repo_token(sources):
-    """从 manifest_sources 中解析首个 Gitee 源的 owner/repo 与 access_token。"""
-    for s in (sources or []):
-        m = re.search(r"/repos/([^/]+)/([^/]+)/releases/", s or "")
-        if m:
-            owner, repo = m.group(1), m.group(2)
-            tm = re.search(r"access_token=([^&]+)", s or "")
-            token = tm.group(1) if tm else ""
-            return f"{owner}/{repo}", token
+    """（保留兼容）未使用：GitHub 模式无需 token，清单直链匿名下载。"""
     return "", ""
 
 
@@ -114,25 +107,12 @@ class Updater:
     def _progress(self, pct, speed):
         self._emit("progress", stage="downloading", pct=pct, speed=speed)
 
-    def _download_via_chunks(self, f: dict, version: str) -> str:
-        """方案①：分块经 Gitee /contents/ API 下载并拼装为完整 exe，返回本地路径。"""
-        repo, token = _parse_repo_token(self.settings.manifest_sources)
-        if not repo or not token:
-            raise DownloadError("缺少仓库/令牌配置，无法分块下载")
-        name = f.get("name") or "update.exe"
-        dest = os.path.join(tempfile.gettempdir(), f"scangate_update_{version}_{name}")
-        return download_via_chunks(
-            f["chunks"], repo, token, dest,
-            expected_sha256=f.get("sha256"), expected_size=f.get("size"),
-            progress=self._progress, cancel=lambda: False,
-            timeout=max(30, self.settings.timeout), retries=self.settings.retries,
-        )
-
     def download_and_install(self, manifest: dict | None = None, cancel=None) -> bool:
         """下载目标文件、校验并触发安装重启。成功进入安装流程返回 True。
 
-        优先走分块方案（manifest file 含 chunks）：经 Gitee /contents/ API
-        逐块下载 base64 解码拼装，绕过 403 与 10MB 限制，实现静默自动更新。
+        GitHub 模式：清单 file.url 是 GitHub Releases 匿名下载直链
+        （github.com/{owner}/{repo}/releases/download/{tag}/{file}，无 403、无需 token），
+        直接用 Downloader 断点续传 + SHA256 校验 + 替换重启，实现静默全自动更新。
         """
         manifest = manifest or self._latest
         if not manifest:
@@ -142,31 +122,26 @@ class Updater:
         if not f:
             self._emit("error", message="更新清单缺少可下载文件")
             return False
+        url = f.get("url")
+        if not url:
+            self._emit("error", message="更新清单缺少下载地址（请检查发布配置）")
+            return False
 
         version = manifest.get("version", "")
+        name = f.get("name") or os.path.basename(url) or "update.exe"
         self.state = UpdateState.DOWNLOADING
         self._emit("progress", stage="downloading", pct=0, speed=0)
+        dest = os.path.join(tempfile.gettempdir(), f"scangate_update_{version}_{name}")
 
-        dest = None
         try:
-            if f.get("chunks"):
-                # 方案①：分块经 Gitee /contents/ API 下载拼装
-                dest = self._download_via_chunks(f, version)
-            else:
-                url = f.get("url")
-                if not url:
-                    self._emit("error", message="更新清单缺少下载地址（且无分块）")
-                    return False
-                name = f.get("name") or os.path.basename(url) or "update.exe"
-                dest = os.path.join(tempfile.gettempdir(), f"scangate_update_{version}_{name}")
-                dl = Downloader(
-                    url, dest,
-                    expected_sha256=f.get("sha256"), expected_size=f.get("size"),
-                    progress=self._progress, cancel=cancel,
-                    timeout=max(30, self.settings.timeout),
-                    retries=self.settings.retries,
-                )
-                dl.run()
+            dl = Downloader(
+                url, dest,
+                expected_sha256=f.get("sha256"), expected_size=f.get("size"),
+                progress=self._progress, cancel=cancel,
+                timeout=max(30, self.settings.timeout),
+                retries=self.settings.retries,
+            )
+            dl.run()
         except DownloadError as e:
             self.state = UpdateState.ERROR
             self._emit("error", message=f"下载失败：{e}")

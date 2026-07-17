@@ -1,53 +1,17 @@
 {
-  "version": "4.4.0",
+  "version": "4.5.0",
   "channel": "stable",
-  "published_at": "2026-07-17T22:24:25.769035+08:00",
-  "notes": "测试版本：仅升级版本号以验证自动分块更新功能（v4.3.0 -> v4.4.0）。",
+  "published_at": "2026-07-18T01:00:19.781500+08:00",
+  "notes": "测试版本：仅升级版本号以验证 GitHub 自动下载更新功能（v4.4.0 -> v4.5.0）。exe 经 GitHub Releases 匿名直链分发，客户端静默下载+SHA256校验+替换重启。",
   "min_version": "",
   "force": false,
   "files": [
     {
       "name": "打印机扫描工具_v4.exe",
-      "size": 42303846,
-      "sha256": "e05d8d4f237bf811d694e590301e83d3926cdeef8adf6c3260acfb9888ebf8ef",
+      "size": 42303301,
+      "sha256": "7c658c9113cbd21c8131c39f1e65282da6145e3801e59c09a4a9b9c2a50c3dd4",
       "target": "self",
-      "chunks": {
-        "base_path": "update_chunks/4.4.0",
-        "count": 6,
-        "chunk_raw": 7340032,
-        "parts": [
-          {
-            "name": "part_000.bin",
-            "size": 7340032,
-            "sha256": "3e624d1b52ab8f0c4a03bb47b7145d7a02c3db6273197ba6d405ced0688f6b7b"
-          },
-          {
-            "name": "part_001.bin",
-            "size": 7340032,
-            "sha256": "40de45227fb3e6ce2a5aa20167f148363d54abead0a3785926ee9370386964be"
-          },
-          {
-            "name": "part_002.bin",
-            "size": 7340032,
-            "sha256": "85a6cdd31670d7cb16986cf92ff9c2d1e4c7f0a17518fed00ead675786ac8b37"
-          },
-          {
-            "name": "part_003.bin",
-            "size": 7340032,
-            "sha256": "869a249fbc16ce158dbb01c52c9a1cf818f07f3855498677d0c2ce19d16199e1"
-          },
-          {
-            "name": "part_004.bin",
-            "size": 7340032,
-            "sha256": "cce14afa2b7a24c5564199d11fd3dc217ce34fee831377cec023ae62e3ff1270"
-          },
-          {
-            "name": "part_005.bin",
-            "size": 5603686,
-            "sha256": "11cbb6fda0b3ff6bd244fe6647c85595c0544fd4cc3911207e5b435fc571067e"
-          }
-        ]
-      }
+      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/4.5.0/%E6%89%93%E5%8D%B0%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%B7%A5%E5%85%B7_v4.exe"
     }
   ]
 }

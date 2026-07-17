@@ -237,10 +237,10 @@
     setUpdState("已打开发行版下载页，请手动下载新版 exe", "");
   }
 
-  // 分块自动下载并安装替换（manifest 含 chunks 时）
+  // 自动下载并安装替换（manifest 含可直接下载的 url 时）
   function doAutoUpdate() {
     var info = updState.latest || {};
-    if (!info.has_chunks) { goToDownload(); return; }
+    if (!info.download_url) { goToDownload(); return; }
     updState.downloading = true;
     $("updFound").hidden = true;
     $("btnUpdNow").hidden = true;
@@ -289,15 +289,15 @@
     $("updNew").textContent = "最新 v" + (info.version || "");
     $("updNotes").textContent = info.notes || "（无更新说明）";
     $("updFound").hidden = false;
-    if (info.has_chunks) {
-      // 方案①：可经 Gitee /contents/ API 分块自动下载并替换
+    if (info.download_url) {
+      // GitHub Releases 匿名直链可程序化下载，自动下载安装替换
       $("btnUpdNow").textContent = gAutoInstall ? "立即更新" : "下载并安装";
       setUpdState("发现新版本，可自动下载安装：", "");
       $("btnUpdNow").hidden = false;
       $("btnUpdLater").hidden = false;
       if (gAutoInstall) doAutoUpdate();   // 全自动：发现即静默下载安装重启
     } else {
-      // 无分块：Gitee 无法程序化下载 exe，改为「前往发行版下载」手动获取
+      // 无直链：前往发行版页面手动下载
       $("btnUpdNow").textContent = "前往下载";
       setUpdState("发现新版本，可前往发行版页面下载：", "");
       $("btnUpdNow").hidden = false;
@@ -539,7 +539,7 @@
     $("btnUpdLater").addEventListener("click", closeUpdateModal);
     $("btnUpdNow").addEventListener("click", function () {
       var info = updState.latest || {};
-      if (info.has_chunks) doAutoUpdate(); else goToDownload();
+      if (info.download_url) doAutoUpdate(); else goToDownload();
     });
     $("updateModal").addEventListener("click", function (e) {
       if (e.target === $("updateModal")) closeUpdateModal();

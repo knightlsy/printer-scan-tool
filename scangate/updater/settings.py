@@ -18,20 +18,17 @@ from dataclasses import dataclass, asdict, field
 # 用户目录运行时覆盖文件（存在则覆盖内置源与偏好）
 OVERRIDE_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_update.json")
 
-# 内置默认：仅走 master 分支的「发行版（release）」作为更新源。
-# 主源 = master 最新发行版（releases/latest，从 body 内嵌清单读取版本与说明）；
-# 兜底源 = master 根目录 version.json（/contents/ API，小文件可靠）。
-# 注：Gitee 对所有程序化下载直链（release 附件 / 源码包）返回 403，且 /contents/
-# 有 10MB base64 上限；故 exe 经 /contents/ 分块（<7MB）上传/下载再拼装（方案①），
-# 客户端可静默自动下载拼装安装，auto_install 开启。
+# 内置默认：清单源指向 GitHub 仓库 master 分支根目录的 version.json
+# （raw.githubusercontent.com 对匿名请求返回 200，无 403，无需 token）。
+# 客户端检测到新版本后，从清单 file.url（GitHub Releases 匿名下载直链）
+# 直接断点续传 + SHA256 校验 + 替换重启，实现静默全自动更新。
 DEFAULTS = {
     "auto_check": True,
     "auto_install": True,
     "timeout": 30,
     "retries": 3,
     "manifest_sources": [
-        "https://gitee.com/api/v5/repos/knightlsy/printer-scan-tool/releases/latest?access_token=08089ed69a061cc7cf7dc013348029a9",
-        "https://gitee.com/api/v5/repos/knightlsy/printer-scan-tool/contents/version.json?ref=master&access_token=08089ed69a061cc7cf7dc013348029a9",
+        "https://raw.githubusercontent.com/knightlsy/printer-scan-tool/master/version.json",
     ],
 }
 
