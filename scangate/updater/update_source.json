@@ -4,7 +4,6 @@
   "timeout": 10,
   "retries": 3,
   "manifest_sources": [
-    "\\\\192.168.4.82\\share\\共享\\updates\\version.json",
     "https://gitee.com/knightlsy/printer-scan-tool/raw/config/version.json"
   ]
 }

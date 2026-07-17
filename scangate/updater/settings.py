@@ -5,10 +5,9 @@
 2. 打包内置的 update_source.json（随 exe 分发，发布方可预置）
 3. 用户目录运行时覆盖 ~/.printer_scan_update.json（改源 / 改开关无需重新打包）
 
-manifest_sources 为「候选清单源列表」，按顺序探测：
-- LAN 共享路径优先（内网秒拉、零流量）
-- Gitee Releases 的 raw 清单 URL 兜底（公网可达）
-首个成功读取到的清单即采用（模式 A：双源回退）。
+manifest_sources 为候选清单源列表，按顺序探测：
+- Gitee raw 清单 URL（公网可达）
+首个成功读取到的清单即采用。
 """
 
 import os
@@ -19,17 +18,13 @@ from dataclasses import dataclass, asdict, field
 # 用户目录运行时覆盖文件（存在则覆盖内置源与偏好）
 OVERRIDE_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_update.json")
 
-# 内置默认：LAN 优先 + Gitee 兜底
-# 说明：
-# - LAN 源直接指向共享目录下的 version.json（SMB 路径）
-# - Gitee 源指向仓库 release 附件里的 version.json（占位，发布前替换 owner/repo）
+# 内置默认：仅 Gitee 源
 DEFAULTS = {
-    "auto_check": True,       # 启动时后台自动检查
-    "auto_install": False,    # False=发现新版仅提示，由用户确认；True=下完静默安装并重启
-    "timeout": 10,            # 单源探测/连接超时（秒）
-    "retries": 3,             # 网络操作重试次数
+    "auto_check": True,
+    "auto_install": False,
+    "timeout": 15,
+    "retries": 3,
     "manifest_sources": [
-        r"\\192.168.4.82\share\共享\updates\version.json",
         "https://gitee.com/knightlsy/printer-scan-tool/raw/config/version.json",
     ],
 }
