@@ -21,7 +21,7 @@ OVERRIDE_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_update.json
 # 内置默认：仅 Gitee 源
 DEFAULTS = {
     "auto_check": True,
-    "auto_install": False,
+    "auto_install": True,
     "timeout": 15,
     "retries": 3,
     "manifest_sources": [

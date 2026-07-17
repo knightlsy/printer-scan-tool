@@ -34,8 +34,8 @@ version.json.template  清单模板
 ```
 
 - `manifest_sources`：清单源列表，当前为 **Gitee `config` 分支的 version.json**（公开仓库，匿名可读）。
-- `auto_check`：启动后台静默检查（发现新版才弹窗，无更新不打扰）。
-- `auto_install`：`false`=发现后由用户点「立即更新」；`true`=下完直接安装重启。
+- `auto_check`：启动后台静默检查（默认开启）。
+- `auto_install`：**默认 `true`（全自动静默更新）**——启动检查到新版本后自动下载、校验、替换并重启应用，无需用户点击确认；仅网络异常/下载失败时安静跳过并在下次启动重试。如需改回「发现后弹窗确认」，把该值改 `false`（或运行时覆盖文件设 `auto_install:false`）。
 
 ## 三、发布新版本（每次发版执行）
 

@@ -299,8 +299,9 @@ class Api:
         def run():
             try:
                 up = Updater(VERSION, on_event=self._on_update_event)
-                up.check(silent=silent)
+                # 先缓存实例：found 事件会触发前端自动安装，需能立即复用已检测到的清单
                 self._updater = up
+                up.check(silent=silent)
             except Exception as e:
                 if not silent:
                     self._call("onUpdateStatus", "error", f"检查更新失败：{e}")

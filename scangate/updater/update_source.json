@@ -1,7 +1,7 @@
 {
   "auto_check": true,
-  "auto_install": false,
-  "timeout": 10,
+  "auto_install": true,
+  "timeout": 15,
   "retries": 3,
   "manifest_sources": [
     "https://gitee.com/knightlsy/printer-scan-tool/raw/config/version.json"

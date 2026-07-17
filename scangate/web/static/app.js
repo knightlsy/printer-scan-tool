@@ -191,6 +191,7 @@
 
   // ---------------- 在线更新 ----------------
   var updState = { latest: null, downloading: false };
+  var gAutoInstall = false;   // 是否自动下载+替换+重启（来自后端偏好）
 
   function fmtSpeed(bps) {
     bps = Number(bps) || 0;
@@ -269,13 +270,21 @@
     updState.latest = info;
     // 若更新弹窗未打开（启动静默检查发现新版），则自动打开提示
     if ($("updateModal").hidden) openUpdateModal();
-    setUpdState("发现新版本，可立即更新：", "");
     $("updCur").textContent = "当前 v" + (info.current || "");
     $("updNew").textContent = "最新 v" + (info.version || "");
     $("updNotes").textContent = info.notes || "（无更新说明）";
     $("updFound").hidden = false;
-    $("btnUpdNow").hidden = false;
-    $("btnUpdLater").hidden = false;
+    if (gAutoInstall) {
+      // 全自动模式：不弹「立即/稍后」选择，直接开始下载并替换重启
+      $("btnUpdNow").hidden = true;
+      $("btnUpdLater").hidden = true;
+      setUpdState("发现新版本，正在自动更新…", "");
+      doUpdateNow();
+    } else {
+      setUpdState("发现新版本，可立即更新：", "");
+      $("btnUpdNow").hidden = false;
+      $("btnUpdLater").hidden = false;
+    }
   };
 
   // 后端事件：下载/校验进度
@@ -858,6 +867,8 @@
     // 同步「启动自动检查更新」开关状态
     var chk = $("chkAutoCheck");
     if (chk && init.update) chk.checked = init.update.auto_check !== false;
+    // 同步「自动安装更新」偏好（决定发现新版本是否立即自动下载替换）
+    gAutoInstall = !!(init.update && init.update.auto_install);
     onStatus("就绪", "idle");
   }
 
