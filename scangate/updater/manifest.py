@@ -84,7 +84,9 @@ def _read_gitee_release(src: str, timeout: int):
 
     - 拉取 release 对象（支持 /releases/latest 或 /releases/{id} 或 /releases/tags/{tag}）
     - 从 body 抽取 ```scangate-manifest 内嵌块作为结构化清单
-    - meta 携带 html_url（发行版网页）供前端跳转
+    - meta 携带 html_url（发行版网页）供前端跳转；
+      Gitee API 不返回 html_url 字段，故从源 URL 解析 owner/repo 并拼出
+      https://gitee.com/{owner}/{repo}/releases/tag/{tag} 作为人工下载入口。
     """
     try:
         req = urllib.request.Request(src, headers={"User-Agent": "SCAN.GATE-Updater"})
@@ -98,9 +100,15 @@ def _read_gitee_release(src: str, timeout: int):
         text = m.group(1).strip() if m else None
         if not text:
             return None, None
+        tag = rel.get("tag_name") or ""
+        # 从源 URL 解析 owner/repo：/repos/{owner}/{repo}/releases/...
+        mrepo = re.search(r"/repos/([^/]+)/([^/]+)/releases/", src)
+        owner = mrepo.group(1) if mrepo else ""
+        repo = mrepo.group(2) if mrepo else ""
+        page = f"https://gitee.com/{owner}/{repo}/releases/tag/{tag}" if (owner and repo and tag) else (rel.get("html_url") or "")
         meta = {
-            "html_url": rel.get("html_url") or "",
-            "tag_name": rel.get("tag_name") or "",
+            "html_url": page,
+            "tag_name": tag,
             "target_commitish": rel.get("target_commitish") or "",
         }
         return text, meta
