@@ -262,6 +262,7 @@ class Api:
             self._call("onUpdateStatus", "up_to_date",
                        f"已是最新版本（v{payload.get('version','')}）")
         elif event == "found":
+            # payload 含 version/current/notes/size/force/published_at/download_page/download_url
             self._call("onUpdateFound", payload)
         elif event == "error":
             self._call("onUpdateStatus", "error", payload.get("message", "更新出错"))

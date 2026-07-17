@@ -1,0 +1,17 @@
+{
+  "version": "4.2.0",
+  "channel": "stable",
+  "published_at": "2026-07-17T19:14:26.175805+08:00",
+  "notes": "更新机制改为走 master 发行版：启动自动检测 master 最新发行版，发现新版本弹窗展示更新说明并提供「前往下载」跳转发行版页面（Gitee 限制不支持程序化自动下载 exe）。源码随版本提交到 master，发行版自动附带源码包。",
+  "min_version": "",
+  "force": false,
+  "files": [
+    {
+      "name": "打印机扫描工具_v4.exe",
+      "url": "https://gitee.com/knightlsy/printer-scan-tool/releases/download/4.2.0/打印机扫描工具_v4.exe",
+      "size": 42300251,
+      "sha256": "80c5f24646409f93116b2826621e87b7678eea22cf4bf789779395ff79c23d05",
+      "target": "self"
+    }
+  ]
+}

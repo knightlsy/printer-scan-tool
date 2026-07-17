@@ -225,16 +225,16 @@
     apiCall("check_update", false);
   }
 
-  function doUpdateNow() {
-    updState.downloading = true;
-    $("btnUpdNow").hidden = true;
-    $("btnUpdLater").hidden = true;
-    $("updProgressWrap").hidden = false;
-    $("updBar").style.width = "0%";
-    $("updPct").textContent = "0%";
-    $("updStage").textContent = "下载中";
-    setUpdState("正在下载更新包…", "");
-    apiCall("download_and_install_update");
+  // 前往发行版页面手动下载（Gitee 不允许程序化拉取 exe，故改为跳转人工下载）
+  function goToDownload() {
+    var info = updState.latest || {};
+    var url = info.download_page || info.download_url || "";
+    if (!url) {
+      setUpdState("未获取到发行版地址", "err");
+      return;
+    }
+    try { window.open(url, "_blank"); } catch (e) {}
+    setUpdState("已打开发行版下载页，请手动下载新版 exe", "");
   }
 
   // 后端事件：状态文本（含成功/失败/回滚/安装等）
@@ -274,17 +274,11 @@
     $("updNew").textContent = "最新 v" + (info.version || "");
     $("updNotes").textContent = info.notes || "（无更新说明）";
     $("updFound").hidden = false;
-    if (gAutoInstall) {
-      // 全自动模式：不弹「立即/稍后」选择，直接开始下载并替换重启
-      $("btnUpdNow").hidden = true;
-      $("btnUpdLater").hidden = true;
-      setUpdState("发现新版本，正在自动更新…", "");
-      doUpdateNow();
-    } else {
-      setUpdState("发现新版本，可立即更新：", "");
-      $("btnUpdNow").hidden = false;
-      $("btnUpdLater").hidden = false;
-    }
+    // Gitee 无法程序化下载 exe，改为「前往发行版下载」手动获取
+    $("btnUpdNow").textContent = "前往下载";
+    setUpdState("发现新版本，可前往发行版页面下载：", "");
+    $("btnUpdNow").hidden = false;
+    $("btnUpdLater").hidden = false;
   };
 
   // 后端事件：下载/校验进度
@@ -519,7 +513,7 @@
     $("btnCheckUpdate").addEventListener("click", checkUpdate);
     $("btnUpdateClose").addEventListener("click", closeUpdateModal);
     $("btnUpdLater").addEventListener("click", closeUpdateModal);
-    $("btnUpdNow").addEventListener("click", doUpdateNow);
+    $("btnUpdNow").addEventListener("click", goToDownload);
     $("updateModal").addEventListener("click", function (e) {
       if (e.target === $("updateModal")) closeUpdateModal();
     });

@@ -1,5 +1,6 @@
 """下载器：断点续传 + SHA256 完整性校验。
 
+- Gitee API 源（/api/v5/repos/…/contents/）：通过认证 API 获取 base64 编码内容并解码写入
 - HTTP(S) 源：优先用 Range 续传（服务器支持则从已落盘字节继续，返回 206；
   不支持 Range（返回 200）则从头重下）。
 - 本地 / UNC(SMB) 源：分块复制，按已落盘偏移续传（等价「读偏移量继续」）。
@@ -10,6 +11,8 @@
 
 import os
 import time
+import json
+import base64
 import shutil
 import hashlib
 import urllib.request
@@ -56,6 +59,12 @@ def _is_http(url: str) -> bool:
     return s.startswith("http://") or s.startswith("https://")
 
 
+def _is_gitee_api(url: str) -> bool:
+    """判断是否为 Gitee API contents 端点。"""
+    s = (url or "").lower()
+    return "/api/v5/repos/" in s and "/contents/" in s
+
+
 class DownloadError(Exception):
     pass
 
@@ -88,7 +97,9 @@ class Downloader:
         last_err = None
         for attempt in range(max(1, self.retries)):
             try:
-                if _is_http(self.url):
+                if _is_gitee_api(self.url):
+                    self._download_gitee_api()
+                elif _is_http(self.url):
                     self._download_http()
                 else:
                     self._copy_local()
@@ -145,6 +156,31 @@ class Downloader:
                         self.progress(min(pct, 100), speed)
                         last_t, last_done = now, done
             self.progress(100 if (total and done >= total) else 99, 0)
+
+    # ---------------- Gitee API 下载（base64 解码） ----------------
+    def _download_gitee_api(self) -> None:
+        """通过 Gitee API contents 端点获取文件内容（base64 编码），解码后写入 .part。
+
+        API 返回 JSON：{"content": "<base64>", "size": N, ...}
+        不支持 Range 续传（API 每次返回完整内容），大文件会占用较多内存。
+        """
+        req = urllib.request.Request(
+            _encode_url(self.url), headers={"User-Agent": "SCAN.GATE-Updater"}
+        )
+        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            raw = resp.read()
+        j = json.loads(raw)
+        content_b64 = j.get("content", "")
+        if not content_b64:
+            raise DownloadError("Gitee API 返回空内容")
+        data = base64.b64decode(content_b64)
+        total = len(data)
+        t0 = time.time()
+        # 写入 .part（带进度）
+        with open(self.part, "wb") as f:
+            f.write(data)
+        # 报告进度
+        self.progress(100, total / max(time.time() - t0, 0.001))
 
     @staticmethod
     def _content_total(resp, resume_from, status) -> int:

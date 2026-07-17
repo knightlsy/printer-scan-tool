@@ -58,7 +58,7 @@ class Updater:
         """
         self.state = UpdateState.CHECKING
         self._emit("checking")
-        manifest, source = fetch_manifest(
+        manifest, source, meta = fetch_manifest(
             self.settings.manifest_sources,
             timeout=self.settings.timeout,
             retries=self.settings.retries,
@@ -75,6 +75,8 @@ class Updater:
             self._source = source
             self.state = UpdateState.FOUND
             f = pick_file(manifest) or {}
+            # Gitee 对所有程序化下载直链返回 403，发行版网页（html_url）才是可人工下载的入口
+            download_page = (meta or {}).get("html_url") or f.get("url") or ""
             self._emit(
                 "found",
                 version=latest,
@@ -84,6 +86,8 @@ class Updater:
                 force=bool(manifest.get("force", False)),
                 published_at=manifest.get("published_at", ""),
                 source=source,
+                download_page=download_page,
+                download_url=f.get("url", ""),
             )
             return manifest
 

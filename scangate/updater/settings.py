@@ -6,7 +6,7 @@
 3. 用户目录运行时覆盖 ~/.printer_scan_update.json（改源 / 改开关无需重新打包）
 
 manifest_sources 为候选清单源列表，按顺序探测：
-- Gitee raw 清单 URL（公网可达）
+- Gitee API contents 端点（带 access_token 认证，绕过风控 403）
 首个成功读取到的清单即采用。
 """
 
@@ -18,14 +18,19 @@ from dataclasses import dataclass, asdict, field
 # 用户目录运行时覆盖文件（存在则覆盖内置源与偏好）
 OVERRIDE_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_update.json")
 
-# 内置默认：仅 Gitee 源
+# 内置默认：仅走 master 分支的「发行版（release）」作为更新源。
+# 主源 = master 最新发行版（releases/latest，从 body 内嵌清单读取版本与说明）；
+# 兜底源 = master 根目录 version.json（/contents/ API，小文件可靠）。
+# 注：Gitee 对所有程序化下载直链（release 附件 / 源码包）返回 403，
+# 因此更新采用「检测 + 通知 + 跳转发行版页面手动下载」模式，auto_install 关闭。
 DEFAULTS = {
     "auto_check": True,
-    "auto_install": True,
-    "timeout": 15,
+    "auto_install": False,
+    "timeout": 30,
     "retries": 3,
     "manifest_sources": [
-        "https://gitee.com/knightlsy/printer-scan-tool/raw/config/version.json",
+        "https://gitee.com/api/v5/repos/knightlsy/printer-scan-tool/releases/latest?access_token=08089ed69a061cc7cf7dc013348029a9",
+        "https://gitee.com/api/v5/repos/knightlsy/printer-scan-tool/contents/version.json?ref=master&access_token=08089ed69a061cc7cf7dc013348029a9",
     ],
 }
 
