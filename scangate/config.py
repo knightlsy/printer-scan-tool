@@ -14,7 +14,7 @@ from dataclasses import dataclass, asdict, field
 # ---------------- 应用元信息 ----------------
 APP_NAME = "SCAN.GATE"
 APP_TITLE = "SCAN.GATE · 打印机扫描共享工具"
-VERSION = "4.2.0"
+VERSION = "4.3.0"
 AUTHOR = "刘思元"
 COPYRIGHT = "© 2026 刘思元. 版权所有"
 

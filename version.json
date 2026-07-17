@@ -1,17 +1,53 @@
 {
-  "version": "4.2.0",
+  "version": "4.3.0",
   "channel": "stable",
-  "published_at": "2026-07-17T19:14:26.175805+08:00",
-  "notes": "更新机制改为走 master 发行版：启动自动检测 master 最新发行版，发现新版本弹窗展示更新说明并提供「前往下载」跳转发行版页面（Gitee 限制不支持程序化自动下载 exe）。源码随版本提交到 master，发行版自动附带源码包。",
+  "published_at": "2026-07-17T21:45:42.379868+08:00",
+  "notes": "更新机制升级为分块自动下载安装（方案①）：exe 经 Gitee /contents/ API 按 7MB 分块上传，客户端检测到新版本后自动逐块下载、SHA256 拼装校验、替换重启，实现静默自动更新。",
   "min_version": "",
   "force": false,
   "files": [
     {
       "name": "打印机扫描工具_v4.exe",
-      "url": "https://gitee.com/knightlsy/printer-scan-tool/releases/download/4.2.0/打印机扫描工具_v4.exe",
-      "size": 42300251,
-      "sha256": "80c5f24646409f93116b2826621e87b7678eea22cf4bf789779395ff79c23d05",
-      "target": "self"
+      "size": 42303298,
+      "sha256": "0bfbe23694fe5b70b4478410473766cb3f527a69a02d9ef77dd0bf10547278a0",
+      "target": "self",
+      "chunks": {
+        "base_path": "update_chunks/4.3.0",
+        "count": 6,
+        "chunk_raw": 7340032,
+        "parts": [
+          {
+            "name": "part_000.bin",
+            "size": 7340032,
+            "sha256": "31e5d0d8137f4b25e688de324b418e272bea03f7523da421869a89f79d3c1c85"
+          },
+          {
+            "name": "part_001.bin",
+            "size": 7340032,
+            "sha256": "d040c2dd03b4dd28a013b4a9e33ceca35e7d1f969ac47138376f5c222e227095"
+          },
+          {
+            "name": "part_002.bin",
+            "size": 7340032,
+            "sha256": "5008a6d198c1cb184bece2fae5be8eecdc0d788ff3f7444c346137caa0d10999"
+          },
+          {
+            "name": "part_003.bin",
+            "size": 7340032,
+            "sha256": "66930c08ebe16bd9c680cef1fcb35436be60384c6ca59ffd251bf5d7bb7c1f7b"
+          },
+          {
+            "name": "part_004.bin",
+            "size": 7340032,
+            "sha256": "a679bcf36b423e6f7a74151fddaab4823689e549c6463728b35d88ff659c43b7"
+          },
+          {
+            "name": "part_005.bin",
+            "size": 5603138,
+            "sha256": "a1f839b7cf40f926e281c327bdf08968443548760b7ed64259cb9977d4b696fc"
+          }
+        ]
+      }
     }
   ]
 }

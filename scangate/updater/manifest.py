@@ -159,7 +159,7 @@ def _validate(manifest: dict) -> bool:
     if not isinstance(files, list) or not files:
         return False
     for f in files:
-        if not isinstance(f, dict) or not f.get("url"):
+        if not isinstance(f, dict) or not (f.get("url") or f.get("chunks")):
             return False
     return True
 

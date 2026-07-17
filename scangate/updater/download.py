@@ -252,3 +252,87 @@ class _Cancelled(Exception):
 
 class _VerifyFailed(Exception):
     pass
+
+
+def download_via_chunks(chunks_info, repo, token, dest,
+                        expected_sha256=None, expected_size=None,
+                        progress=None, cancel=None, timeout=30, retries=2):
+    """根据 manifest 的 chunks 信息，分块经 Gitee /contents/ API 下载并拼装为完整文件。
+
+    chunks_info = {
+        "base_path": "update_chunks/4.3.0",
+        "count": 6,
+        "parts": [{"name": "part_000.bin", "size": N, "sha256": "..."}, ...]
+    }
+    - 每块 GET /contents/{base_path}/{name}?ref=master&access_token=token（base64 解码）
+    - 每块独立 sha256 校验（若 chunks 提供）
+    - 拼装后整体 sha256 校验（expected_sha256）
+    - 成功原子 rename 为 dest
+    """
+    progress = progress or (lambda p, s: None)
+    cancel = cancel or (lambda: False)
+    base_path = (chunks_info or {}).get("base_path", "")
+    parts = (chunks_info or {}).get("parts", [])
+    if not base_path or not parts:
+        raise DownloadError("chunks 信息缺失")
+    os.makedirs(os.path.dirname(os.path.abspath(dest)), exist_ok=True)
+    part_file = dest + ".part"
+    total = expected_size or sum(p.get("size", 0) for p in parts) or 1
+    done = 0
+    overall = hashlib.sha256()
+    try:
+        with open(part_file, "wb") as out:
+            for p in parts:
+                if cancel():
+                    raise DownloadError("已取消")
+                name = p.get("name")
+                url = (f"https://gitee.com/api/v5/repos/{repo}/contents/"
+                       f"{base_path}/{name}?ref=master&access_token={token}")
+                data = None
+                last_err = None
+                for attempt in range(max(1, retries)):
+                    try:
+                        req = urllib.request.Request(
+                            _encode_url(url), headers={"User-Agent": "SCAN.GATE-Updater"})
+                        with urllib.request.urlopen(req, timeout=timeout) as resp:
+                            j = json.loads(resp.read())
+                        cb = j.get("content", "")
+                        if not cb:
+                            raise DownloadError(f"分块 {name} 返回空内容")
+                        data = base64.b64decode(cb)
+                        break
+                    except Exception as e:
+                        last_err = e
+                        time.sleep(1.5 * (attempt + 1))
+                if data is None:
+                    raise DownloadError(f"分块 {name} 下载失败：{last_err}")
+                if p.get("sha256"):
+                    if hashlib.sha256(data).hexdigest().lower() != p["sha256"].lower():
+                        raise DownloadError(f"分块 {name} 校验不通过（可能损坏）")
+                out.write(data)
+                done += len(data)
+                overall.update(data)
+                pct = int(done / total * 100) if total else 0
+                progress(min(pct, 100), 0)
+        # 整体校验
+        if expected_size and os.path.getsize(part_file) != expected_size:
+            raise DownloadError("拼装后文件大小不符")
+        if expected_sha256:
+            if overall.hexdigest().lower() != expected_sha256.lower():
+                raise DownloadError("拼装后 SHA256 校验不通过（文件可能损坏或被篡改）")
+        if os.path.exists(dest):
+            os.remove(dest)
+        os.replace(part_file, dest)
+        return dest
+    except DownloadError:
+        try:
+            os.remove(part_file)
+        except Exception:
+            pass
+        raise
+    except Exception as e:
+        try:
+            os.remove(part_file)
+        except Exception:
+            pass
+        raise DownloadError(str(e))

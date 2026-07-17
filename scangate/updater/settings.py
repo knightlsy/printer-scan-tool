@@ -21,11 +21,12 @@ OVERRIDE_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_update.json
 # 内置默认：仅走 master 分支的「发行版（release）」作为更新源。
 # 主源 = master 最新发行版（releases/latest，从 body 内嵌清单读取版本与说明）；
 # 兜底源 = master 根目录 version.json（/contents/ API，小文件可靠）。
-# 注：Gitee 对所有程序化下载直链（release 附件 / 源码包）返回 403，
-# 因此更新采用「检测 + 通知 + 跳转发行版页面手动下载」模式，auto_install 关闭。
+# 注：Gitee 对所有程序化下载直链（release 附件 / 源码包）返回 403，且 /contents/
+# 有 10MB base64 上限；故 exe 经 /contents/ 分块（<7MB）上传/下载再拼装（方案①），
+# 客户端可静默自动下载拼装安装，auto_install 开启。
 DEFAULTS = {
     "auto_check": True,
-    "auto_install": False,
+    "auto_install": True,
     "timeout": 30,
     "retries": 3,
     "manifest_sources": [
@@ -38,7 +39,7 @@ DEFAULTS = {
 @dataclass
 class UpdateSettings:
     auto_check: bool = True
-    auto_install: bool = False
+    auto_install: bool = True
     timeout: int = 10
     retries: int = 3
     manifest_sources: list = field(default_factory=list)
