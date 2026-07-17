@@ -1,50 +1,50 @@
 {
-  "version": "4.3.0",
+  "version": "4.4.0",
   "channel": "stable",
-  "published_at": "2026-07-17T21:45:42.379868+08:00",
-  "notes": "更新机制升级为分块自动下载安装（方案①）：exe 经 Gitee /contents/ API 按 7MB 分块上传，客户端检测到新版本后自动逐块下载、SHA256 拼装校验、替换重启，实现静默自动更新。",
+  "published_at": "2026-07-17T22:24:25.769035+08:00",
+  "notes": "测试版本：仅升级版本号以验证自动分块更新功能（v4.3.0 -> v4.4.0）。",
   "min_version": "",
   "force": false,
   "files": [
     {
       "name": "打印机扫描工具_v4.exe",
-      "size": 42303298,
-      "sha256": "0bfbe23694fe5b70b4478410473766cb3f527a69a02d9ef77dd0bf10547278a0",
+      "size": 42303846,
+      "sha256": "e05d8d4f237bf811d694e590301e83d3926cdeef8adf6c3260acfb9888ebf8ef",
       "target": "self",
       "chunks": {
-        "base_path": "update_chunks/4.3.0",
+        "base_path": "update_chunks/4.4.0",
         "count": 6,
         "chunk_raw": 7340032,
         "parts": [
           {
             "name": "part_000.bin",
             "size": 7340032,
-            "sha256": "31e5d0d8137f4b25e688de324b418e272bea03f7523da421869a89f79d3c1c85"
+            "sha256": "3e624d1b52ab8f0c4a03bb47b7145d7a02c3db6273197ba6d405ced0688f6b7b"
           },
           {
             "name": "part_001.bin",
             "size": 7340032,
-            "sha256": "d040c2dd03b4dd28a013b4a9e33ceca35e7d1f969ac47138376f5c222e227095"
+            "sha256": "40de45227fb3e6ce2a5aa20167f148363d54abead0a3785926ee9370386964be"
           },
           {
             "name": "part_002.bin",
             "size": 7340032,
-            "sha256": "5008a6d198c1cb184bece2fae5be8eecdc0d788ff3f7444c346137caa0d10999"
+            "sha256": "85a6cdd31670d7cb16986cf92ff9c2d1e4c7f0a17518fed00ead675786ac8b37"
           },
           {
             "name": "part_003.bin",
             "size": 7340032,
-            "sha256": "66930c08ebe16bd9c680cef1fcb35436be60384c6ca59ffd251bf5d7bb7c1f7b"
+            "sha256": "869a249fbc16ce158dbb01c52c9a1cf818f07f3855498677d0c2ce19d16199e1"
           },
           {
             "name": "part_004.bin",
             "size": 7340032,
-            "sha256": "a679bcf36b423e6f7a74151fddaab4823689e549c6463728b35d88ff659c43b7"
+            "sha256": "cce14afa2b7a24c5564199d11fd3dc217ce34fee831377cec023ae62e3ff1270"
           },
           {
             "name": "part_005.bin",
-            "size": 5603138,
-            "sha256": "a1f839b7cf40f926e281c327bdf08968443548760b7ed64259cb9977d4b696fc"
+            "size": 5603686,
+            "sha256": "11cbb6fda0b3ff6bd244fe6647c85595c0544fd4cc3911207e5b435fc571067e"
           }
         ]
       }
