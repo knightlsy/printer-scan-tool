@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+  <defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#eef2f9"/><stop offset="1" stop-color="#d8e2f2"/>
+  </linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#5689ff"/><stop offset="1" stop-color="#2f6bff"/>
+  </linearGradient>
+  <filter id="glass" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="6" result="b"/>
+    <feComponentTransfer><feFuncA type="linear" slope="0.55"/></feComponentTransfer>
+  </filter>
+  <radialGradient id="blobA" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#9fc0ff" stop-opacity="0.7"/><stop offset="1" stop-color="#9fc0ff" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="blobB" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#c7b8ff" stop-opacity="0.6"/><stop offset="1" stop-color="#c7b8ff" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+  <rect width="960" height="600" fill="url(#bg)"/>
+  <circle cx="180" cy="120" r="220" fill="url(#blobA)"/>
+  <circle cx="820" cy="500" r="240" fill="url(#blobB)"/>
+  <rect x="0" y="0" width="960" height="50" fill="#ffffff" fill-opacity="0.55" filter="url(#glass)"/>
+  <circle cx="28" cy="25" r="7" fill="url(#accent)"/>
+  <circle cx="28" cy="25" r="12" fill="#5689ff" fill-opacity="0.25"/>
+  <text x="44" y="30" font-size="16" font-weight="700" fill="#1f2d4d">SCAN.GATE</text>
+  <text x="138" y="30" font-size="12" fill="#5a6a88">v4.0.0</text>
+  <rect x="360" y="14" width="84" height="22" rx="11" fill="#1fa463" fill-opacity="0.12"/>
+  <circle cx="376" cy="25" r="4" fill="#1fa463"/>
+  <text x="388" y="29" font-size="11" fill="#1fa463">已连接</text>
+  <rect x="852" y="16" width="22" height="18" rx="4" fill="#ffffff" fill-opacity="0.7"/>
+  <rect x="878" y="16" width="22" height="18" rx="4" fill="#ffffff" fill-opacity="0.7"/>
+  <rect x="904" y="16" width="22" height="18" rx="4" fill="#ff6b6b" fill-opacity="0.85"/>
+  <rect x="320" y="62" width="80" height="22" rx="11" fill="#ffffff" fill-opacity="0.6"/>
+  <circle cx="334" cy="73" r="4" fill="#1fa463"/>
+  <text x="344" y="77" font-size="11" fill="#42634f">已连接</text>
+  <rect x="24" y="96" width="270" height="480" rx="14" fill="#ffffff" fill-opacity="0.6" filter="url(#glass)"/>
+  <text x="42" y="124" font-size="14" font-weight="700" fill="#1f2d4d">连接设置</text>
+  <rect x="240" y="110" width="42" height="22" rx="6" fill="#ffffff" fill-opacity="0.8"/>
+  <text x="252" y="125" font-size="11" fill="#3a4a6a">管理</text>
+  <text x="42" y="158" font-size="11" fill="#5a6a88">服务器地址</text>
+  <rect x="42" y="164" width="234" height="26" rx="6" fill="#ffffff" fill-opacity="0.9"/>
+  <text x="50" y="181" font-size="12" fill="#2a3a58">192.168.4.82</text>
+  <text x="42" y="208" font-size="11" fill="#5a6a88">共享名</text>
+  <rect x="42" y="214" width="234" height="26" rx="6" fill="#ffffff" fill-opacity="0.9"/>
+  <text x="50" y="231" font-size="12" fill="#2a3a58">share</text>
+  <text x="42" y="258" font-size="11" fill="#5a6a88">子目录</text>
+  <rect x="42" y="264" width="234" height="26" rx="6" fill="#ffffff" fill-opacity="0.9"/>
+  <text x="50" y="281" font-size="12" fill="#2a3a58">PDF</text>
+  <text x="42" y="308" font-size="11" fill="#5a6a88">用户名</text>
+  <rect x="42" y="314" width="234" height="26" rx="6" fill="#ffffff" fill-opacity="0.9"/>
+  <text x="50" y="331" font-size="12" fill="#2a3a58">share</text>
+  <text x="42" y="358" font-size="11" fill="#5a6a88">密码</text>
+  <rect x="42" y="364" width="234" height="26" rx="6" fill="#ffffff" fill-opacity="0.9"/>
+  <text x="50" y="381" font-size="12" fill="#2a3a58">••••••</text>
+  <rect x="42" y="408" width="234" height="34" rx="8" fill="url(#accent)"/>
+  <text x="138" y="430" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">连接共享</text>
+  <rect x="42" y="450" width="234" height="32" rx="8" fill="#e9eef8"/>
+  <text x="138" y="471" font-size="13" fill="#3a4a6a" text-anchor="middle">断开连接</text>
+  <rect x="42" y="490" width="234" height="30" rx="8" fill="#ffffff" fill-opacity="0.7"/>
+  <text x="138" y="510" font-size="12" fill="#5a6a88" text-anchor="middle">关于程序</text>
+  <rect x="312" y="96" width="340" height="480" rx="14" fill="#ffffff" fill-opacity="0.6" filter="url(#glass)"/>
+  <text x="330" y="124" font-size="14" font-weight="700" fill="#1f2d4d">文件列表</text>
+  <rect x="330" y="140" width="50" height="26" rx="6" fill="url(#accent)"/>
+  <text x="355" y="157" font-size="11" fill="#fff" text-anchor="middle">刷新</text>
+  <rect x="386" y="140" width="50" height="26" rx="6" fill="url(#accent)"/>
+  <text x="411" y="157" font-size="11" fill="#fff" text-anchor="middle">上传</text>
+  <rect x="442" y="140" width="50" height="26" rx="6" fill="url(#accent)"/>
+  <text x="467" y="157" font-size="11" fill="#fff" text-anchor="middle">下载</text>
+  <rect x="498" y="140" width="50" height="26" rx="6" fill="#ff6b6b" fill-opacity="0.85"/>
+  <text x="523" y="157" font-size="11" fill="#fff" text-anchor="middle">删除</text>
+  <text x="330" y="190" font-size="11" fill="#5a6a88">名称</text>
+  <text x="560" y="190" font-size="11" fill="#5a6a88" text-anchor="middle">大小</text>
+  <text x="630" y="190" font-size="11" fill="#5a6a88" text-anchor="end">修改时间</text>
+  <rect x="330" y="200" width="304" height="30" rx="6" fill="#2f6bff" fill-opacity="0.10"/>
+  <text x="336" y="220" font-size="12" fill="#2a3a58">扫描件_20260709_001.pdf</text>
+  <text x="560" y="220" font-size="12" fill="#5a6a88" text-anchor="middle">1.2 MB</text>
+  <text x="630" y="220" font-size="11" fill="#5a6a88" text-anchor="end">07-09 10:30</text>
+  <rect x="330" y="234" width="304" height="30" rx="6" fill="#ffffff" fill-opacity="0.5"/>
+  <text x="336" y="254" font-size="12" fill="#2a3a58">月度报表_Q2.pdf</text>
+  <text x="560" y="254" font-size="12" fill="#5a6a88" text-anchor="middle">3.8 MB</text>
+  <text x="630" y="254" font-size="11" fill="#5a6a88" text-anchor="end">07-08 16:12</text>
+  <rect x="330" y="268" width="304" height="30" rx="6" fill="#ffffff" fill-opacity="0.5"/>
+  <text x="336" y="288" font-size="12" fill="#2a3a58">合同扫描件.pdf</text>
+  <text x="560" y="288" font-size="12" fill="#5a6a88" text-anchor="middle">820 KB</text>
+  <text x="630" y="288" font-size="11" fill="#5a6a88" text-anchor="end">07-07 09:45</text>
+  <rect x="668" y="96" width="268" height="480" rx="14" fill="#ffffff" fill-opacity="0.6" filter="url(#glass)"/>
+  <text x="686" y="124" font-size="14" font-weight="700" fill="#1f2d4d">预览</text>
+  
+    <rect x="686" y="150" width="232" height="300" rx="10" fill="#ffffff" fill-opacity="0.95"/>
+    <rect x="700" y="166" width="204" height="14" rx="3" fill="#cdd8ee"/>
+    <rect x="700" y="188" width="180" height="10" rx="3" fill="#dde6f5"/>
+    <rect x="700" y="206" width="200" height="10" rx="3" fill="#dde6f5"/>
+    <rect x="700" y="224" width="150" height="10" rx="3" fill="#dde6f5"/>
+    <rect x="700" y="250" width="204" height="120" rx="6" fill="#eef2fb"/>
+    <rect x="700" y="380" width="120" height="10" rx="3" fill="#dde6f5"/>
+    <rect x="700" y="398" width="170" height="10" rx="3" fill="#dde6f5"/>
+    <rect x="760" y="430" width="112" height="28" rx="14" fill="#eef2fb"/>
+    <text x="802" y="449" font-size="12" fill="#5a6a88" text-anchor="middle">‹ 上一页 / 下一页 ›</text>
+  
+  <rect x="666" y="94" width="272" height="484" rx="10" fill="none" stroke="#2f6bff" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <rect x="670" y="68" width="226" height="20" rx="6" fill="#2f6bff"/>
+  <text x="677" y="82" font-size="12" fill="#fff" text-anchor="start">右侧预览：文档图像 + 翻页控件</text>
+</svg>

@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- SCAN.GATE 小尺寸简化字形（16/32px 专用）：去正文行、粗括号、大光点 -->
+  <defs>
+    <linearGradient id="bgS" x1="0" y1="0" x2="0.55" y2="1">
+      <stop offset="0" stop-color="#eef2f9"/>
+      <stop offset="1" stop-color="#d8e2f2"/>
+    </linearGradient>
+    <linearGradient id="accentS" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5689ff"/>
+      <stop offset="0.55" stop-color="#2f6bff"/>
+      <stop offset="1" stop-color="#1f54e0"/>
+    </linearGradient>
+    <radialGradient id="orbS" cx="0.36" cy="0.3" r="0.85">
+      <stop offset="0" stop-color="#7ea7ff"/>
+      <stop offset="0.5" stop-color="#2f6bff"/>
+      <stop offset="1" stop-color="#1f54e0"/>
+    </radialGradient>
+    <clipPath id="tileClipS"><rect x="40" y="40" width="432" height="432" rx="112" ry="112"/></clipPath>
+  </defs>
+
+  <rect x="40" y="40" width="432" height="432" rx="112" ry="112" fill="url(#bgS)"/>
+  <g clip-path="url(#tileClipS)">
+    <!-- 白玻璃页 -->
+    <rect x="150" y="132" width="212" height="248" rx="26" fill="#ffffff" fill-opacity="0.94"/>
+    <!-- 粗取景括号 -->
+    <g stroke="url(#accentS)" stroke-width="18" stroke-linecap="round" fill="none">
+      <path d="M120 190 V150 A24 24 0 0 1 144 126 H184"/>
+      <path d="M328 126 H368 A24 24 0 0 1 392 150 V190"/>
+      <path d="M392 322 V362 A24 24 0 0 1 368 386 H328"/>
+      <path d="M184 386 H144 A24 24 0 0 1 120 362 V322"/>
+    </g>
+    <!-- 光束 -->
+    <rect x="146" y="248" width="220" height="16" rx="8" fill="url(#accentS)"/>
+    <rect x="146" y="248" width="220" height="6" rx="3" fill="#eaf1ff" opacity="0.9"/>
+    <!-- 大光点 -->
+    <circle cx="366" cy="256" r="30" fill="url(#orbS)"/>
+    <circle cx="356" cy="246" r="9" fill="#ffffff" opacity="0.85"/>
+  </g>
+  <rect x="41" y="41" width="430" height="430" rx="111" ry="111" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="2"/>
+</svg>

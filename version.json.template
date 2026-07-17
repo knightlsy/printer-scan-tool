@@ -1,0 +1,26 @@
+{
+  "version": "4.2.0",
+  "channel": "stable",
+  "published_at": "2026-07-20T10:00:00+08:00",
+  "notes": "本次更新内容：\n- 新增在线更新功能\n- 修复 PDF 压缩进度显示",
+  "min_version": "4.0.0",
+  "force": false,
+  "files": [
+    {
+      "name": "打印机扫描工具_v4.exe",
+      "url": "\\\\192.168.4.82\\share\\共享\\updates\\4.2.0\\打印机扫描工具_v4.exe",
+      "size": 44300000,
+      "sha256": "在此填入打包后自动计算的 sha256",
+      "target": "self",
+      "source": "lan"
+    },
+    {
+      "name": "打印机扫描工具_v4.exe",
+      "url": "https://gitee.com/your-owner/your-repo/releases/download/latest/打印机扫描工具_v4.exe",
+      "size": 44300000,
+      "sha256": "同上，与 exe 内容一致",
+      "target": "self",
+      "source": "gitee"
+    }
+  ]
+}

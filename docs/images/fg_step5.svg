@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+  <rect width="960" height="600" fill="#dfe6f2"/>
+  <rect x="200" y="85" width="560" height="450" rx="8" fill="#ffffff" stroke="#b9c4dc"/>
+  <rect x="200" y="85" width="560" height="34" rx="8" fill="url(#accent)"/>
+  <rect x="200" y="103" width="560" height="16" fill="url(#accent)"/>
+  <text x="214" y="107" font-size="13" fill="#fff" font-weight="600">打开</text>
+  <text x="746" y="107" font-size="15" fill="#fff" text-anchor="middle">×</text>
+  
+  <rect x="220" y="150" width="520" height="180" rx="4" fill="#f4f7fc" stroke="#cdd8ee"/>
+  <text x="234" y="172" font-size="11" fill="#7a89a8">文件夹内容（可多选）</text>
+  <rect x="234" y="184" width="490" height="16" rx="3" fill="#ffffff" stroke="#cdd8ee"/>
+  <rect x="248" y="184" width="14" height="14" rx="2" fill="#2f6bff"/>
+  <text x="270" y="196" font-size="12" fill="#2a3a58">回执_已签字.pdf</text>
+  <rect x="234" y="206" width="490" height="16" rx="3" fill="#eef2fb"/>
+  <rect x="248" y="206" width="14" height="14" rx="2" fill="#2f6bff"/>
+  <text x="270" y="218" font-size="12" fill="#2a3a58">报销单_07月.pdf</text>
+  <rect x="234" y="228" width="490" height="16" rx="3" fill="#ffffff" stroke="#cdd8ee"/>
+  <rect x="248" y="228" width="14" height="14" rx="2" fill="#fff" stroke="#9fb3d8"/>
+  <text x="270" y="240" font-size="12" fill="#2a3a58">会议纪要.pdf</text>
+  <rect x="234" y="250" width="490" height="16" rx="3" fill="#eef2fb"/>
+  <rect x="248" y="250" width="14" height="14" rx="2" fill="#fff" stroke="#9fb3d8"/>
+  <text x="270" y="262" font-size="12" fill="#2a3a58">合同附件.pdf</text>
+  <text x="220" y="356" font-size="12" fill="#3a4a6a">文件名(N):</text>
+  <rect x="300" y="344" width="380" height="26" rx="4" fill="#fff" stroke="#9fb3d8"/>
+  <text x="308" y="362" font-size="12" fill="#2a3a58">回执_已签字.pdf; 报销单_07月.pdf</text>
+  <text x="220" y="402" font-size="12" fill="#3a4a6a">文件类型(T):</text>
+  <rect x="300" y="390" width="220" height="26" rx="4" fill="#fff" stroke="#9fb3d8"/>
+  <text x="308" y="408" font-size="12" fill="#2a3a58">所有文件 (*.*)</text>
+  <rect x="544" y="489" width="92" height="30" rx="4" fill="url(#accent)"/><text x="590" y="509" font-size="12" fill="#fff" text-anchor="middle">打开</text><rect x="648" y="489" width="92" height="30" rx="4" fill="#e9eef8"/><text x="694" y="509" font-size="12" fill="#3a4a6a" text-anchor="middle">取消</text>
+</svg>

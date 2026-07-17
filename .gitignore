@@ -1,0 +1,39 @@
+# --- 构建产物 ---
+build/
+dist/
+*.spec.bak
+__pycache__/
+*.pyc
+
+# --- 打包/二进制 ---
+*.exe
+*.bat
+*.ico
+*.png.preview
+
+# --- 虚拟环境/依赖缓存 ---
+venv/
+.env/
+__pycache__/
+
+# --- 编辑器/系统 ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- 临时/调试 ---
+_patch*.py
+_gitee*.py
+_e2e*.py
+*.log
+*.preview.png
+*.preview
+
+# --- 保留：scangate/build_exe*.bat 是构建脚本（非二进制），不忽略 ---
+!scangate/
+
+# --- 第三方运行时（PyInstaller 打入的 WebView2 运行时，非源码，体积巨大）---
+vendor/webview2/runtime/
+vendor/webview2/
+vendor/

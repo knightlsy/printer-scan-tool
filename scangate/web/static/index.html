@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCAN.GATE · 打印机扫描共享工具</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 全局背景：冷色系一致渐变 + 柔光，作为毛玻璃的模糊源 -->
+  <div class="bg" aria-hidden="true">
+    <span class="blob blob-a"></span>
+    <span class="blob blob-b"></span>
+  </div>
+
+  <div class="app">
+    <!-- 顶栏（毛玻璃 · 无边框自定义标题栏） -->
+    <header class="toolbar glass">
+      <!-- 仅此区域可拖拽：class="pywebview-drag-region" 由 pywebview 识别为拖拽区，
+           窗口控制按钮置于其外的 .caption，确保点击按钮不会误触发拖拽。 -->
+      <div class="title-drag pywebview-drag-region">
+        <div class="brand">
+          <span class="logo-dot"></span>
+          <span class="brand-name" id="brandName">SCAN.GATE</span>
+          <span class="brand-ver" id="brandVer">v4.0.0</span>
+        </div>
+        <div class="toolbar-right">
+          <span class="conn-chip" id="connChip">
+            <span class="conn-dot" id="connDot"></span>
+            <span id="connText">未连接</span>
+          </span>
+        </div>
+      </div>
+      <!-- 窗口控制按钮（不属于拖拽区） -->
+      <div class="caption">
+        <button class="cap-btn" id="btnMin" type="button" title="最小化" aria-label="最小化">
+          <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><line x1="2" y1="9.5" x2="10" y2="9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+        <button class="cap-btn" id="btnMax" type="button" title="最大化 / 还原" aria-label="最大化">
+          <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><rect x="2.2" y="2.2" width="7.6" height="7.6" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+        </button>
+        <button class="cap-btn cap-close" id="btnClose" type="button" title="关闭" aria-label="关闭">
+          <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><line x1="3" y1="3" x2="9" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="3" x2="3" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 就绪状态：水平 + 垂直居中，响应式 -->
+    <section class="status-banner glass" id="statusBanner">
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-text" id="statusText">就绪</span>
+    </section>
+
+    <!-- 三栏主体（毛玻璃面板） -->
+    <main class="grid">
+      <!-- 连接设置 -->
+      <section class="panel glass" id="connPanel">
+        <div class="panel-head">
+          <span class="head-title"><span class="head-dot"></span>连接设置</span>
+          <button class="btn btn-ghost btn-sm" id="btnManage" type="button" title="管理已保存的服务器配置">管理</button>
+        </div>
+        <div class="panel-body">
+          <label class="field">
+            <span class="field-label">服务器地址</span>
+            <input class="input" id="fHost" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">共享名</span>
+            <input class="input" id="fShare" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">子目录</span>
+            <input class="input" id="fSub" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">用户名</span>
+            <input class="input" id="fUser" type="text" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">密码</span>
+            <input class="input" id="fPass" type="password" autocomplete="off" />
+          </label>
+          <button class="btn btn-primary block" id="btnConnect">连接共享</button>
+          <button class="btn btn-secondary block" id="btnDisconnect">断开连接</button>
+          <button class="btn btn-ghost block" id="btnAbout">关于程序</button>
+        </div>
+      </section>
+
+      <!-- 文件列表 -->
+      <section class="panel glass" id="filePanel">
+        <div class="panel-head"><span class="head-dot"></span>文件列表</div>
+        <div class="panel-body file-body">
+          <div class="file-actions">
+            <button class="btn btn-primary" id="btnRefresh">刷新</button>
+            <button class="btn btn-primary" id="btnUpload">上传</button>
+            <button class="btn btn-primary" id="btnDownload">下载</button>
+            <button class="btn btn-danger" id="btnDelete">删除</button>
+            <button class="btn btn-ghost" id="btnTools">小工具</button>
+          </div>
+          <div class="list-wrap">
+            <div class="list-head">
+              <span class="col-name">名称</span>
+              <span class="col-size">大小</span>
+              <span class="col-time">修改时间</span>
+            </div>
+            <div class="list-scroll" id="fileList">
+              <div class="list-empty" id="listEmpty">连接共享后显示文件列表</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 预览 -->
+      <section class="panel glass" id="previewPanel">
+        <div class="panel-head"><span class="head-dot"></span>预览</div>
+        <div class="panel-body preview-body">
+          <div class="preview-info" id="previewInfo">选择文件以预览</div>
+          <div class="preview-stage" id="previewStage">
+            <span class="preview-placeholder">暂无预览</span>
+          </div>
+          <div class="preview-nav" id="previewNav" hidden>
+            <button class="btn btn-secondary" id="btnPrev">‹ 上一页</button>
+            <span class="preview-page" id="previewPage">1 / 1</span>
+            <button class="btn btn-secondary" id="btnNext">下一页 ›</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 八向自由缩放热区（无边框窗口下自定义缩放：上下左右 + 四角） -->
+  <div class="resize-layer" id="resizeLayer" aria-hidden="true">
+    <div class="rz rz-n"  data-dir="n"></div>
+    <div class="rz rz-s"  data-dir="s"></div>
+    <div class="rz rz-e"  data-dir="e"></div>
+    <div class="rz rz-w"  data-dir="w"></div>
+    <div class="rz rz-ne" data-dir="ne"></div>
+    <div class="rz rz-nw" data-dir="nw"></div>
+    <div class="rz rz-se" data-dir="se"></div>
+    <div class="rz rz-sw" data-dir="sw"></div>
+  </div>
+
+  <!-- 进度遮罩（毛玻璃） -->
+  <div class="overlay" id="overlay" hidden>
+    <div class="overlay-card glass">
+      <div class="overlay-title" id="overlayTitle">处理中…</div>
+      <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="overlay-msg" id="overlayMsg"></div>
+      <button class="btn btn-secondary" id="btnCancel" hidden>取消</button>
+    </div>
+  </div>
+
+  <!-- 关于弹窗（毛玻璃） -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card glass">
+      <div class="modal-title">关于 SCAN.GATE</div>
+      <div class="modal-row"><span class="modal-k">名称</span><span id="mName"></span></div>
+      <div class="modal-row"><span class="modal-k">版本</span><span id="mVer"></span></div>
+      <div class="modal-row"><span class="modal-k">作者</span><span class="author-link" id="mAuthor" role="button" tabindex="0" title="点击选择联系方式"></span></div>
+      <div class="modal-row"><span class="modal-k">版权</span><span id="mCopy"></span></div>
+      <label class="upd-pref">
+        <input type="checkbox" id="chkAutoCheck" />
+        <span>启动时自动检查更新</span>
+      </label>
+      <button class="btn btn-secondary block" id="btnCheckUpdate">检查更新</button>
+      <button class="btn btn-primary block" id="btnModalClose">关闭</button>
+    </div>
+  </div>
+
+  <!-- 在线更新弹窗（毛玻璃） -->
+  <div class="modal" id="updateModal" hidden>
+    <div class="modal-card glass update-card">
+      <div class="modal-head">
+        <div class="modal-title left" id="updTitle">检查更新</div>
+        <button class="icon-x" id="btnUpdateClose" type="button" aria-label="关闭">×</button>
+      </div>
+
+      <div class="upd-body">
+        <div class="upd-state" id="updState">正在检查更新…</div>
+
+        <div class="upd-found" id="updFound" hidden>
+          <div class="upd-ver-row">
+            <span class="upd-ver-cur" id="updCur">当前 v—</span>
+            <span class="upd-arrow" aria-hidden="true">→</span>
+            <span class="upd-ver-new" id="updNew">最新 v—</span>
+          </div>
+          <div class="upd-notes-label">更新内容</div>
+          <div class="upd-notes" id="updNotes"></div>
+        </div>
+
+        <div class="upd-progress-wrap" id="updProgressWrap" hidden>
+          <div class="upd-progress-head">
+            <span id="updStage">下载中</span>
+            <span id="updPct">0%</span>
+          </div>
+          <div class="upd-progress"><div class="upd-progress-bar" id="updBar"></div></div>
+          <div class="upd-speed" id="updSpeed"></div>
+        </div>
+
+        <div class="upd-actions" id="updActions">
+          <button class="btn btn-ghost" id="btnUpdLater" type="button">稍后</button>
+          <button class="btn btn-primary" id="btnUpdNow" type="button" hidden>立即更新</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 作者联系方式选择弹窗（公司内 / 公司外） -->
+  <div class="modal" id="authorModal" hidden>
+    <div class="modal-card glass author-card">
+      <div class="modal-title">添加「刘思元」为飞书联系人</div>
+      <div class="modal-sub">请先选择你的身份，再跳转至对应的邀请链接：</div>
+      <button class="choice-btn choice-internal" id="btnLinkInternal" type="button">
+        <span class="choice-ico" aria-hidden="true">🏢</span>
+        <span class="choice-main">
+          <span class="choice-t">公司内</span>
+          <span class="choice-d">飞书同事 · 内部员工</span>
+        </span>
+        <span class="choice-arrow" aria-hidden="true">›</span>
+      </button>
+      <button class="choice-btn choice-external" id="btnLinkExternal" type="button">
+        <span class="choice-ico" aria-hidden="true">🌐</span>
+        <span class="choice-main">
+          <span class="choice-t">公司外</span>
+          <span class="choice-d">外部联系人</span>
+        </span>
+        <span class="choice-arrow" aria-hidden="true">›</span>
+      </button>
+      <button class="btn btn-ghost block" id="btnAuthorClose">取消</button>
+    </div>
+  </div>
+
+  <!-- 服务器管理弹窗（列表 + 添加入口） -->
+  <div class="modal" id="serverModal" hidden>
+    <div class="modal-card glass server-card">
+      <div class="modal-head">
+        <div class="modal-title left">服务器管理</div>
+        <button class="icon-x" id="btnServerClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-sub left">已保存的服务器配置，点击「连接」切换为当前使用项。</div>
+      <div class="server-list" id="serverList"></div>
+      <button class="btn btn-primary block" id="btnAddServer" type="button">+ 添加服务器</button>
+    </div>
+  </div>
+
+  <!-- 添加 / 编辑 服务器表单弹窗 -->
+  <div class="modal" id="serverFormModal" hidden>
+    <div class="modal-card glass">
+      <div class="modal-head">
+        <div class="modal-title left" id="serverFormTitle">添加服务器</div>
+        <button class="icon-x" id="btnServerFormClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <label class="field">
+        <span class="field-label">配置名称</span>
+        <input class="input" id="sfName" type="text" autocomplete="off" placeholder="例如：公区打印机" />
+      </label>
+      <label class="field">
+        <span class="field-label">服务器地址</span>
+        <input class="input" id="sfHost" type="text" autocomplete="off" placeholder="例如：192.168.4.82" />
+      </label>
+      <label class="field">
+        <span class="field-label">共享名</span>
+        <input class="input" id="sfShare" type="text" autocomplete="off" placeholder="例如：share" />
+      </label>
+      <label class="field">
+        <span class="field-label">子目录</span>
+        <input class="input" id="sfSub" type="text" autocomplete="off" placeholder="例如：PDF" />
+      </label>
+      <label class="field">
+        <span class="field-label">用户名</span>
+        <input class="input" id="sfUser" type="text" autocomplete="off" placeholder="例如：share" />
+      </label>
+      <label class="field">
+        <span class="field-label">密码</span>
+        <input class="input" id="sfPass" type="password" autocomplete="off" />
+      </label>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="btnServerSave" type="button">保存</button>
+        <button class="btn btn-ghost" id="btnServerCancel" type="button">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 首次启动强制实名弹窗（不可绕过：确认即登记，取消即退出软件） -->
+  <div class="modal" id="nameModal" hidden>
+    <div class="modal-card glass name-card">
+      <div class="modal-title">欢迎使用 SCAN.GATE</div>
+      <div class="name-desc">真实姓名用于区分操作用户</div>
+      <label class="field name-field">
+        <span class="field-label">真实姓名</span>
+        <input class="input" id="fRealName" type="text" autocomplete="off" maxlength="20" placeholder="请输入真实姓名" />
+      </label>
+      <div class="name-error" id="nameError"></div>
+      <div class="name-actions">
+        <button class="btn btn-primary" id="btnNameOk" type="button">确认</button>
+        <button class="btn btn-ghost" id="btnNameCancel" type="button">取消（退出）</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 小工具弹窗（工具箱：工具选择列表 + 工具面板） -->
+  <div class="modal" id="toolsModal" hidden>
+    <div class="modal-card glass tools-card">
+      <div class="modal-head">
+        <div class="modal-title left" id="toolsTitle">工具箱</div>
+        <button class="icon-x" id="btnToolsClose" type="button" aria-label="关闭">×</button>
+      </div>
+
+      <div class="tools-body">
+        <!-- 第一级：工具选择列表（点击卡片进入对应工具面板） -->
+        <div class="tool-grid" id="toolGrid">
+          <button class="tool-card" type="button" data-tool="pdf_compress">
+            <span class="tool-card-ico" aria-hidden="true">🗜️</span>
+            <span class="tool-card-name">PDF 压缩</span>
+            <span class="tool-card-desc">选择本地 PDF 并压缩，支持质量调节与大小对比</span>
+          </button>
+          <!-- 未来新增工具：复制上方一个 .tool-card，改 data-tool / 图标 / 名称 / 描述，
+               并在下方新增对应 id 的 .tool-panel，再在 app.js 的 showTool() 中加分支即可。 -->
+        </div>
+
+        <!-- 第二级：PDF 压缩面板 -->
+        <div class="tool-panel" id="pdfPanel" hidden>
+          <button class="tool-back" type="button" id="btnToolBack">← 返回工具箱</button>
+
+          <div class="tool-block">
+            <div class="tool-block-title">PDF 压缩</div>
+            <div class="tool-desc">选择本地 PDF，压缩后另存为更小的文件（自动命名为「原名_compressed.pdf」）。</div>
+
+            <div class="tool-drop" id="toolsDrop">
+              <div class="tool-drop-ico" aria-hidden="true">📄</div>
+              <div class="tool-drop-text">点击选择，或将 PDF 文件拖拽到此处</div>
+              <button class="btn btn-secondary" id="btnPickPdf" type="button">选择 PDF 文件</button>
+            </div>
+            <div class="tool-file" id="toolsPdfPath">未选择文件</div>
+
+            <label class="field">
+              <span class="field-label">压缩级别</span>
+              <div class="seg" id="toolsLevel">
+                <button class="seg-btn active" data-level="standard" type="button">标准</button>
+                <button class="seg-btn" data-level="high" type="button">高压缩</button>
+                <button class="seg-btn" data-level="custom" type="button">自定义</button>
+              </div>
+            </label>
+            <div class="tool-hint">标准：清理冗余、压缩字体与图片数据，画质无损。高压缩：额外降低内嵌图片分辨率，体积更小但画质略降。自定义：拖动滑块自行设定压缩率。</div>
+
+            <div class="tool-custom" id="toolsCustom" hidden>
+              <div class="tool-custom-row">
+                <span class="field-label">压缩率</span>
+                <span class="tool-rate-val" id="toolsRateVal">70%</span>
+              </div>
+              <input class="tool-slider" id="toolsRate" type="range" min="0" max="100" value="70" step="1" />
+              <div class="tool-custom-hint">向左 = 体积更小 / 画质更低；向右 = 画质更高 / 体积更大</div>
+            </div>
+
+            <div class="progress tool-progress" id="toolProgress" hidden>
+              <div class="progress-bar" id="toolProgressBar"></div>
+            </div>
+
+            <button class="btn btn-primary block" id="btnDoCompress" type="button">开始压缩</button>
+
+            <div class="tool-result" id="toolsResult" hidden>
+              <div class="tool-result-row">
+                <div class="tool-result-card">
+                  <div class="tr-label">原始大小</div>
+                  <div class="tr-value" id="trOrig">-</div>
+                </div>
+                <div class="tool-result-arrow" aria-hidden="true">→</div>
+                <div class="tool-result-card tr-new">
+                  <div class="tr-label">压缩后</div>
+                  <div class="tr-value" id="trNew">-</div>
+                </div>
+              </div>
+              <div class="tr-saved" id="trSaved"></div>
+            </div>
+
+            <div class="tool-status" id="toolsStatus"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

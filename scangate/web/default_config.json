@@ -1,0 +1,15 @@
+{
+  "servers": [
+    {
+      "id": "c719bf21c4ef",
+      "name": "默认服务器",
+      "host": "192.168.4.82",
+      "share": "share",
+      "subfolder": "共享",
+      "username": "share",
+      "password": "share"
+    }
+  ],
+  "current_id": "c719bf21c4ef",
+  "operator": ""
+}

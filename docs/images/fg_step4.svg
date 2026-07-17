@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="'Segoe UI','Microsoft YaHei',sans-serif">
+  <rect width="960" height="600" fill="#dfe6f2"/>
+  <rect x="200" y="90" width="560" height="440" rx="8" fill="#ffffff" stroke="#b9c4dc"/>
+  <rect x="200" y="90" width="560" height="34" rx="8" fill="url(#accent)"/>
+  <rect x="200" y="108" width="560" height="16" fill="url(#accent)"/>
+  <text x="214" y="112" font-size="13" fill="#fff" font-weight="600">另存为</text>
+  <text x="746" y="112" font-size="15" fill="#fff" text-anchor="middle">×</text>
+  
+  <rect x="220" y="150" width="520" height="170" rx="4" fill="#f4f7fc" stroke="#cdd8ee"/>
+  <text x="234" y="172" font-size="11" fill="#7a89a8">导航窗格</text>
+  <rect x="234" y="184" width="150" height="14" rx="3" fill="#dde6f5"/>
+  <rect x="234" y="204" width="120" height="14" rx="3" fill="#dde6f5"/>
+  <rect x="234" y="224" width="140" height="14" rx="3" fill="#dde6f5"/>
+  <text x="404" y="172" font-size="11" fill="#7a89a8">文件夹内容</text>
+  <rect x="404" y="184" width="320" height="16" rx="3" fill="#ffffff" stroke="#cdd8ee"/>
+  <rect x="404" y="208" width="320" height="14" rx="3" fill="#eef2fb"/>
+  <rect x="404" y="228" width="290" height="14" rx="3" fill="#eef2fb"/>
+  <text x="220" y="346" font-size="12" fill="#3a4a6a">文件名(N):</text>
+  <rect x="300" y="334" width="380" height="26" rx="4" fill="#fff" stroke="#9fb3d8"/>
+  <text x="308" y="352" font-size="12" fill="#2a3a58">扫描件_20260709_001.pdf</text>
+  <text x="220" y="392" font-size="12" fill="#3a4a6a">保存类型(T):</text>
+  <rect x="300" y="380" width="220" height="26" rx="4" fill="#fff" stroke="#9fb3d8"/>
+  <text x="308" y="398" font-size="12" fill="#2a3a58">PDF 文件 (*.pdf)</text>
+  <rect x="544" y="484" width="92" height="30" rx="4" fill="url(#accent)"/><text x="590" y="504" font-size="12" fill="#fff" text-anchor="middle">保存</text><rect x="648" y="484" width="92" height="30" rx="4" fill="#e9eef8"/><text x="694" y="504" font-size="12" fill="#3a4a6a" text-anchor="middle">取消</text>
+</svg>
