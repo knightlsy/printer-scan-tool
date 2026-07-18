@@ -1,17 +1,22 @@
 {
-  "version": "4.5.0",
+  "version": "4.6.0",
   "channel": "stable",
-  "published_at": "2026-07-18T01:00:19.781500+08:00",
-  "notes": "测试版本：仅升级版本号以验证 GitHub 自动下载更新功能（v4.4.0 -> v4.5.0）。exe 经 GitHub Releases 匿名直链分发，客户端静默下载+SHA256校验+替换重启。",
+  "published_at": "2026-07-18T01:21:21.161837+08:00",
+  "notes": "升级地址改为 CDN 加速（ghproxy 发布资产镜像优先 + mirror.ghproxy 兜底 + 官方直链保底）：exe 作为 GitHub Release 资产分发，客户端按多镜像链静默下载安装，显著提升下载速度与稳定性。",
   "min_version": "",
   "force": false,
   "files": [
     {
-      "name": "打印机扫描工具_v4.exe",
-      "size": 42303301,
-      "sha256": "7c658c9113cbd21c8131c39f1e65282da6145e3801e59c09a4a9b9c2a50c3dd4",
+      "name": "printer-scan-tool.exe",
+      "size": 42303611,
+      "sha256": "541e047e6d42d48e9df02e5c82784038724afccbe50d947881bdeaf47f46fe4f",
       "target": "self",
-      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/4.5.0/%E6%89%93%E5%8D%B0%E6%9C%BA%E6%89%AB%E6%8F%8F%E5%B7%A5%E5%85%B7_v4.exe"
+      "url": "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
+      "urls": [
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
+        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe"
+      ]
     }
   ]
 }

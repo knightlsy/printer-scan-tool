@@ -1,1 +1,1 @@
-{"auto_check": true, "auto_install": true, "timeout": 30, "retries": 3, "manifest_sources": ["https://raw.githubusercontent.com/knightlsy/printer-scan-tool/master/version.json"]}
+{"auto_check": true, "auto_install": true, "timeout": 30, "retries": 3, "manifest_sources": ["https://raw.githubusercontent.com/knightlsy/printer-scan-tool/master/version.json", "https://cdn.jsdelivr.net/gh/knightlsy/printer-scan-tool@master/version.json"]}

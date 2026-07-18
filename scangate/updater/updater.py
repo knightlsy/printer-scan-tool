@@ -81,8 +81,9 @@ class Updater:
             self._source = source
             self.state = UpdateState.FOUND
             f = pick_file(manifest) or {}
-            # Gitee 对所有程序化下载直链返回 403，发行版网页（html_url）才是可人工下载的入口
-            download_page = (meta or {}).get("html_url") or f.get("url") or ""
+            # 主下载地址（优先 CDN 加速直链），用于界面展示 / 手动下载入口
+            urls = f.get("urls") or ([f.get("url")] if f.get("url") else [])
+            download_page = (meta or {}).get("html_url") or urls[0] or ""
             self._emit(
                 "found",
                 version=latest,
@@ -93,7 +94,8 @@ class Updater:
                 published_at=manifest.get("published_at", ""),
                 source=source,
                 download_page=download_page,
-                download_url=f.get("url", ""),
+                download_url=urls[0] if urls else (f.get("url") or ""),
+                download_urls=urls,
                 has_chunks=bool(f.get("chunks")),
             )
             return manifest
@@ -110,9 +112,10 @@ class Updater:
     def download_and_install(self, manifest: dict | None = None, cancel=None) -> bool:
         """下载目标文件、校验并触发安装重启。成功进入安装流程返回 True。
 
-        GitHub 模式：清单 file.url 是 GitHub Releases 匿名下载直链
-        （github.com/{owner}/{repo}/releases/download/{tag}/{file}，无 403、无需 token），
-        直接用 Downloader 断点续传 + SHA256 校验 + 替换重启，实现静默全自动更新。
+        CDN 加速方案：清单 file 提供 urls 候选列表（jsDelivr 加速直链优先，
+        其后为 ghproxy 镜像 / raw.githubusercontent 直链兜底）。按顺序逐个尝试，
+        首个成功（断点续传 + SHA256 校验通过）即采用，实现「高速 + 稳定」的
+        静默全自动更新；某镜像失败时自动清理残片并切到下一个，绝不中断升级。
         """
         manifest = manifest or self._latest
         if not manifest:
@@ -122,29 +125,46 @@ class Updater:
         if not f:
             self._emit("error", message="更新清单缺少可下载文件")
             return False
-        url = f.get("url")
-        if not url:
+        urls = f.get("urls") or ([f.get("url")] if f.get("url") else [])
+        if not urls:
             self._emit("error", message="更新清单缺少下载地址（请检查发布配置）")
             return False
 
         version = manifest.get("version", "")
-        name = f.get("name") or os.path.basename(url) or "update.exe"
+        name = f.get("name") or os.path.basename(urls[0]) or "update.exe"
         self.state = UpdateState.DOWNLOADING
         self._emit("progress", stage="downloading", pct=0, speed=0)
         dest = os.path.join(tempfile.gettempdir(), f"scangate_update_{version}_{name}")
 
-        try:
-            dl = Downloader(
-                url, dest,
-                expected_sha256=f.get("sha256"), expected_size=f.get("size"),
-                progress=self._progress, cancel=cancel,
-                timeout=max(30, self.settings.timeout),
-                retries=self.settings.retries,
-            )
-            dl.run()
-        except DownloadError as e:
+        last_err = None
+        for idx, attempt_url in enumerate(urls):
+            if idx > 0:
+                # 切到备用镜像：重置进度条，避免沿用上一个镜像的进度
+                self._emit("progress", stage="downloading", pct=0, speed=0)
+            try:
+                dl = Downloader(
+                    attempt_url, dest,
+                    expected_sha256=f.get("sha256"), expected_size=f.get("size"),
+                    progress=self._progress, cancel=cancel,
+                    timeout=max(30, self.settings.timeout),
+                    retries=self.settings.retries,
+                )
+                dl.run()
+                last_err = None
+                break
+            except DownloadError as e:
+                last_err = e
+                # 清理上一条镜像残留的 .part，防止下一个镜像误续传到损坏内容
+                try:
+                    part = dest + ".part"
+                    if os.path.exists(part):
+                        os.remove(part)
+                except Exception:
+                    pass
+                continue
+        if last_err is not None:
             self.state = UpdateState.ERROR
-            self._emit("error", message=f"下载失败：{e}")
+            self._emit("error", message=f"下载失败（已尝试全部镜像）：{last_err}")
             return False
 
         # 校验已在下载器内完成（sha256/size），到这里即视为完整

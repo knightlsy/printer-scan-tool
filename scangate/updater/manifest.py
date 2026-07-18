@@ -150,7 +150,11 @@ def _read_source(src: str, timeout: int):
 
 
 def _validate(manifest: dict) -> bool:
-    """清单最低合法性：必须有 version 与非空 files 列表，且每个 file 有 url。"""
+    """清单最低合法性：必须有 version 与非空 files 列表，且每个 file 有下载地址。
+
+    下载地址可以是单条 url（兼容旧清单），也可以是 urls 候选列表
+    （jsDelivr 加速直链优先 + ghproxy/raw 兜底），二选一即可。
+    """
     if not isinstance(manifest, dict):
         return False
     if "version" not in manifest:
@@ -159,7 +163,12 @@ def _validate(manifest: dict) -> bool:
     if not isinstance(files, list) or not files:
         return False
     for f in files:
-        if not isinstance(f, dict) or not (f.get("url") or f.get("chunks")):
+        if not isinstance(f, dict):
+            return False
+        has_addr = bool(f.get("url")) or (
+            isinstance(f.get("urls"), list) and any(f.get("urls"))
+        )
+        if not (has_addr or f.get("chunks")):
             return False
     return True
 

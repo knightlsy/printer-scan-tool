@@ -225,7 +225,7 @@
     apiCall("check_update", false);
   }
 
-  // 前往发行版页面手动下载（Gitee 不允许程序化拉取 exe，故改为跳转人工下载）
+  // 前往发行版/下载页手动下载（优先用 CDN 加速直链 download_url，浏览器内也更快）
   function goToDownload() {
     var info = updState.latest || {};
     var url = info.download_page || info.download_url || "";
@@ -290,7 +290,7 @@
     $("updNotes").textContent = info.notes || "（无更新说明）";
     $("updFound").hidden = false;
     if (info.download_url) {
-      // GitHub Releases 匿名直链可程序化下载，自动下载安装替换
+      // CDN 加速直链（jsDelivr 优先，后端自动多镜像回退）可程序化下载，自动下载安装替换
       $("btnUpdNow").textContent = gAutoInstall ? "立即更新" : "下载并安装";
       setUpdState("发现新版本，可自动下载安装：", "");
       $("btnUpdNow").hidden = false;

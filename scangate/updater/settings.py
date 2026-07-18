@@ -6,8 +6,11 @@
 3. 用户目录运行时覆盖 ~/.printer_scan_update.json（改源 / 改开关无需重新打包）
 
 manifest_sources 为候选清单源列表，按顺序探测：
-- Gitee API contents 端点（带 access_token 认证，绕过风控 403）
-首个成功读取到的清单即采用。
+- 主源 raw.githubusercontent.com（匿名 200，无 403，永远最新）
+- 备源 jsDelivr CDN（cdn.jsdelivr.net/gh/...，国内可达、加速稳定）
+首个成功读取到的清单即采用。清单（version.json）很小，主源保证「即时最新」，
+备源 CDN 仅在主源不可达时兜底。真正耗流量的是 exe 本体，其下载在 updater 内
+走 jsDelivr 优先的多镜像链（见 manifest.files[].urls）。
 """
 
 import os
@@ -19,8 +22,9 @@ from dataclasses import dataclass, asdict, field
 OVERRIDE_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_update.json")
 
 # 内置默认：清单源指向 GitHub 仓库 master 分支根目录的 version.json
-# （raw.githubusercontent.com 对匿名请求返回 200，无 403，无需 token）。
-# 客户端检测到新版本后，从清单 file.url（GitHub Releases 匿名下载直链）
+# - 主源 raw.githubusercontent.com（匿名 200，无 403，永远最新）
+# - 备源 jsDelivr CDN（cdn.jsdelivr.net/gh/...，国内可达、加速稳定）
+# 客户端检测到新版本后，从清单 file.urls（jsDelivr 优先的多镜像链）下载，
 # 直接断点续传 + SHA256 校验 + 替换重启，实现静默全自动更新。
 DEFAULTS = {
     "auto_check": True,
@@ -29,6 +33,7 @@ DEFAULTS = {
     "retries": 3,
     "manifest_sources": [
         "https://raw.githubusercontent.com/knightlsy/printer-scan-tool/master/version.json",
+        "https://cdn.jsdelivr.net/gh/knightlsy/printer-scan-tool@master/version.json",
     ],
 }
 
