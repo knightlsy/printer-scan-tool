@@ -305,7 +305,7 @@ def main():
 
     print(f"[4/6] 建/更新发行版 {tag}")
     rel_notes = (args.notes or "") + f"\n\nCDN 加速下载（推荐，国内更快更稳）：\n{primary}\n\n"
-    rel_notes += "客户端将自动按 ghproxy → mirror.ghproxy → 官方直链 顺序尝试下载并静默安装。"
+    rel_notes += "客户端将自动按 ghproxy.net → ghproxy.com.cn → 官方直链 顺序尝试下载并静默安装。"
     rel = ensure_release(tag, version, rel_notes, TOKEN, API)
     rid = rel.get("id")
     print(f"      发行版 id={rid}")
