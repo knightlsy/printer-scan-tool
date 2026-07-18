@@ -123,7 +123,7 @@ def gh_api(method, url, data=None, headers=None, raw=False, token=""):
         })
     req = urllib.request.Request(url, data=payload, headers=h, method=method)
     try:
-        with urllib.request.urlopen(req, timeout=300) as r:
+        with urllib.request.urlopen(req, timeout=600) as r:
             return r.status, (r.read() if raw else r.read().decode("utf-8", "replace"))
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8", "replace")
