@@ -1,20 +1,20 @@
 {
   "version": "4.6.0",
   "channel": "stable",
-  "published_at": "2026-07-18T01:21:21.161837+08:00",
-  "notes": "升级地址改为 CDN 加速（ghproxy 发布资产镜像优先 + mirror.ghproxy 兜底 + 官方直链保底）：exe 作为 GitHub Release 资产分发，客户端按多镜像链静默下载安装，显著提升下载速度与稳定性。",
+  "published_at": "2026-07-19T02:13:32.266172+08:00",
+  "notes": "升级地址改为 CDN 加速：exe 作为 GitHub Release 资产分发，客户端按多镜像链（ghproxy.net 优先 + ghproxy.com.cn 兜底 + 官方直链保底）静默下载安装。",
   "min_version": "",
   "force": false,
   "files": [
     {
-      "name": "printer-scan-tool.exe",
+      "name": "打印机扫描工具_v4.exe",
       "size": 42303611,
       "sha256": "541e047e6d42d48e9df02e5c82784038724afccbe50d947881bdeaf47f46fe4f",
       "target": "self",
       "url": "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
       "urls": [
         "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
-        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
+        "https://ghproxy.com.cn/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
         "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe"
       ]
     }
