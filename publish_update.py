@@ -273,7 +273,7 @@ def main():
     #   3) GitHub Releases 官方直链（最后保底）
     urls = [
         f"https://ghproxy.net/https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
-        f"https://mirror.ghproxy.com/https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
+        f"https://ghproxy.com.cn/https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
         f"https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
     ]
     primary = urls[0]
