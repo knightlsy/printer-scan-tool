@@ -117,10 +117,9 @@ def gh_api(method, url, data=None, headers=None, raw=False, token=""):
              "User-Agent": "SCAN.GATE-Publisher"}
     else:
         payload = data
-        h = dict(headers or {
-            "Authorization": f"Bearer {token}",
-            "User-Agent": "SCAN.GATE-Publisher",
-        })
+        # 自定义 headers 时不能丢掉鉴权与 User-Agent（否则上传附件会因无 token 被 400 拒绝）
+        h = {"Authorization": f"Bearer {token}", "User-Agent": "SCAN.GATE-Publisher"}
+        h.update(headers or {})
     req = urllib.request.Request(url, data=payload, headers=h, method=method)
     try:
         with urllib.request.urlopen(req, timeout=600) as r:
