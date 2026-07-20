@@ -28,9 +28,8 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='打印机扫描工具_v4',
     debug=False,
     bootloader_ignore_signals=False,
@@ -45,4 +44,15 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=['scan_gate_icon.ico'],
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    [],
+    name='打印机扫描工具_v4',
+    strip=False,
+    upx=False,
+    upx_exclude=[],
 )
