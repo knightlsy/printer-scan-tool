@@ -3,7 +3,7 @@
 """一键发布到 GitHub（CDN 加速版）：建仓库 + 源码/资源推 master + 打 tag + 建 release + 上传 exe 资产。
 
 用法：
-    python publish_update.py --exe dist/打印机扫描工具_v4.exe --version 4.6.0 \
+    python publish_update.py --exe dist/printer-scan-tool.zip --version 4.7.0 \
         --notes "更新说明" --token ghp_xxx
 
 做了什么：
@@ -234,7 +234,8 @@ def build_manifest(exe_path, version, notes, min_version, force, owner, repo,
 def main():
     ap = argparse.ArgumentParser(
         description="发布 SCAN.GATE 更新到 GitHub（CDN 加速：ghproxy Release 资产镜像 + 官方直链多镜像）")
-    ap.add_argument("--exe", required=True, help="要发布的 exe 路径")
+    ap.add_argument("--exe", required=True, dest="exe",
+                    help="要发布的产物路径：onedir 模式下传 zip 包（如 dist/printer-scan-tool.zip）")
     ap.add_argument("--version", required=True, help="版本号，如 4.6.0")
     ap.add_argument("--notes", default="", help="更新说明")
     ap.add_argument("--min-version", default="", help="强制更新的最低版本（可空）")
@@ -262,14 +263,14 @@ def main():
     UPLOAD = f"https://uploads.github.com/repos/{OWNER}/{REPO}"
 
     if not os.path.isfile(args.exe):
-        print(f"错误：找不到 exe：{args.exe}")
+        print(f"错误：找不到产物：{args.exe}")
         sys.exit(1)
 
     version = args.version
     tag = f"v{version}"
     root = os.path.dirname(os.path.abspath(__file__))
-    # 仓库内提交的 exe 用 ASCII 文件名（URL 干净）；安装时会改名为当前 exe
-    REPO_EXE_NAME = "printer-scan-tool.exe"
+    # 仓库内资产用 ASCII 文件名（URL 干净）；onedir 模式为 zip 包
+    REPO_EXE_NAME = "printer-scan-tool.zip"
 
     # CDN 加速下载地址（按优先级，exe 走 GitHub Releases 资产 + 镜像）：
     #   0) Cloudflare Worker 反代（若提供 --cf-url，置顶为主用，国内最快最稳）
