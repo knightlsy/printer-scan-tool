@@ -15,11 +15,15 @@ if _PROJECT_ROOT not in sys.path:
 
 from scangate.core.singleton import is_already_running, show_already_running
 from scangate.web.app import run
+from scangate.installer import maybe_install_and_relaunch
 
 
 def main():
     if is_already_running():
         show_already_running()
+        return
+    # 首次运行（来自便携/解压目录）自动安装到本机并重启，保证只跑「已安装」副本
+    if maybe_install_and_relaunch():
         return
     run()
 
