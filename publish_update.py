@@ -244,6 +244,10 @@ def main():
     ap.add_argument("--repo", default="knightlsy/printer-scan-tool", help="GitHub owner/repo")
     ap.add_argument("--no-git", action="store_true", help="跳过 git 推送到 master")
     ap.add_argument("--no-asset", action="store_true", help="不上传 exe 发行版资产（届时仅官方直链可用）")
+    ap.add_argument("--cf-url",
+                    default=os.environ.get("CF_WORKER_URL",
+                                           "https://printer-scan-cf-proxy.1292671633.workers.dev"),
+                    help="Cloudflare Worker 反代基地址（如 https://xxx.workers.dev），作为升级主链置顶；默认已内置本项目 Worker")
     args = ap.parse_args()
 
     TOKEN = args.token
@@ -268,10 +272,16 @@ def main():
     REPO_EXE_NAME = "printer-scan-tool.exe"
 
     # CDN 加速下载地址（按优先级，exe 走 GitHub Releases 资产 + 镜像）：
-    #   1) ghproxy 镜像 releases 资产（国内对 GitHub Releases 的加速，最快最稳，主用）
-    #   2) mirror.ghproxy.com 镜像 releases 资产（ghproxy 备线）
-    #   3) GitHub Releases 官方直链（最后保底）
-    urls = [
+    #   0) Cloudflare Worker 反代（若提供 --cf-url，置顶为主用，国内最快最稳）
+    #   1) ghproxy 镜像 releases 资产（ghproxy 备线）
+    #   2) GitHub Releases 官方直链（最后保底）
+    urls = []
+    if args.cf_url:
+        cf_base = args.cf_url.rstrip("/")
+        cf_url = f"{cf_base}/{tag}/{REPO_EXE_NAME}"
+        urls.append(cf_url)
+        print(f"     已启用 Cloudflare 主链：{cf_url}")
+    urls += [
         f"https://ghproxy.net/https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
         f"https://ghproxy.com.cn/https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
         f"https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
@@ -305,7 +315,7 @@ def main():
 
     print(f"[4/6] 建/更新发行版 {tag}")
     rel_notes = (args.notes or "") + f"\n\nCDN 加速下载（推荐，国内更快更稳）：\n{primary}\n\n"
-    rel_notes += "客户端将自动按 ghproxy.net → ghproxy.com.cn → 官方直链 顺序尝试下载并静默安装。"
+    rel_notes += "客户端将自动按 Cloudflare Worker → ghproxy.net → ghproxy.com.cn → 官方直链 顺序尝试下载并静默安装。"
     rel = ensure_release(tag, version, rel_notes, TOKEN, API)
     rid = rel.get("id")
     print(f"      发行版 id={rid}")
