@@ -246,8 +246,8 @@ def main():
     ap.add_argument("--no-asset", action="store_true", help="不上传 exe 发行版资产（届时仅官方直链可用）")
     ap.add_argument("--cf-url",
                     default=os.environ.get("CF_WORKER_URL",
-                                           "https://printer-scan-cf-proxy.1292671633.workers.dev"),
-                    help="Cloudflare Worker 反代基地址（如 https://xxx.workers.dev），作为升级主链置顶；默认已内置本项目 Worker")
+                                           "https://printer-scan.knightlsy.cn"),
+                    help="Cloudflare Worker 反代基地址（自定义域名或 *.workers.dev），作为升级主链置顶；默认已内置本项目自定义域名")
     args = ap.parse_args()
 
     TOKEN = args.token
@@ -281,6 +281,11 @@ def main():
         cf_url = f"{cf_base}/{tag}/{REPO_EXE_NAME}"
         urls.append(cf_url)
         print(f"     已启用 Cloudflare 主链：{cf_url}")
+        # 额外保留 workers.dev 作为 Cloudflare 备用主机名（自定义域名异常时仍走 Cloudflare 边缘）
+        alt = "https://printer-scan-cf-proxy.1292671633.workers.dev"
+        if alt.rstrip("/") != cf_base:
+            urls.append(f"{alt}/{tag}/{REPO_EXE_NAME}")
+            print(f"     已追加 Cloudflare 备链：{alt}/{tag}/{REPO_EXE_NAME}")
     urls += [
         f"https://ghproxy.net/https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
         f"https://ghproxy.com.cn/https://github.com/{OWNER}/{REPO}/releases/download/{tag}/{REPO_EXE_NAME}",
