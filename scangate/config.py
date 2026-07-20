@@ -14,7 +14,7 @@ from dataclasses import dataclass, asdict, field
 # ---------------- 应用元信息 ----------------
 APP_NAME = "SCAN.GATE"
 APP_TITLE = "SCAN.GATE · 打印机扫描共享工具"
-VERSION = "4.6.2"
+VERSION = "4.7.0"
 AUTHOR = "刘思元"
 COPYRIGHT = "© 2026 刘思元. 版权所有"
 
@@ -32,6 +32,23 @@ CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_config.json")
 LOG_ENDPOINT = "https://printer-scan.knightlsy.cn"
 LOG_INGEST_KEY = "sg_ingest_e590f98784e06a3d"
 LOG_TO_WORKER = True
+
+# ---------------- 安装模式（onedir + 桌面/开始菜单快捷方式） ----------------
+# 非管理员安装位置：%LOCALAPPDATA%\Programs\PrinterScanTool\
+# onedir 打包：exe 与依赖 DLL 同目录，启动直接读本地文件，不往 %TEMP% 解压，
+# 彻底规避 Windows Defender 对「自解压 exe 加载临时 DLL」的拦截（Failed to load Python DLL）。
+_LOCAL_APPDATA = os.environ.get("LOCALAPPDATA") or os.path.join(
+    os.path.expanduser("~"), "AppData", "Local"
+)
+INSTALL_DIR = os.path.join(_LOCAL_APPDATA, "Programs", "PrinterScanTool")
+# onedir 文件夹内的主程序文件名（与 spec 的 name 一致）
+APP_EXE_BASENAME = "打印机扫描工具_v4.exe"
+# 安装标记文件（存在即视为已安装到本机）
+INSTALL_MARKER = os.path.join(INSTALL_DIR, ".installed")
+# 开始菜单程序组名
+START_MENU_GROUP = "SCAN.GATE"
+# 快捷方式显示名
+SHORTCUT_NAME = "打印机扫描工具.lnk"
 
 
 @dataclass
