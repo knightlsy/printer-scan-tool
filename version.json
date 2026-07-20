@@ -1,23 +1,23 @@
 {
-  "version": "4.6.1",
+  "version": "4.6.2",
   "channel": "stable",
-  "published_at": "2026-07-20T11:21:03.871911+08:00",
-  "notes": "升级主链切换为自定义域名 printer-scan.knightlsy.cn（Cloudflare 边缘加速，国内更快更稳）；保留 workers.dev / ghproxy.net / ghproxy.com.cn / 官方直链多重保底。",
+  "published_at": "2026-07-20T14:27:56.760367+08:00",
+  "notes": "新增操作审计日志集中查询：会话日志上报至 Cloudflare Worker（KV 存储），可通过密码保护页 https://printer-scan.knightlsy.cn/logs 查看/筛选/导出。本地共享目录仍作兜底。",
   "min_version": "",
   "force": false,
   "files": [
     {
       "name": "printer-scan-tool.exe",
-      "size": 42303603,
-      "sha256": "18fde2485963887e75c31172f520e020b547308e59827bd75e9184d87821c2e1",
+      "size": 42305681,
+      "sha256": "3f6e52c2ce30ed1f370b359fc44f5ca46bbebd728037d0afe714b1cbdac648c2",
       "target": "self",
-      "url": "https://printer-scan.knightlsy.cn/v4.6.1/printer-scan-tool.exe",
+      "url": "https://printer-scan.knightlsy.cn/v4.6.2/printer-scan-tool.exe",
       "urls": [
-        "https://printer-scan.knightlsy.cn/v4.6.1/printer-scan-tool.exe",
-        "https://printer-scan-cf-proxy.1292671633.workers.dev/v4.6.1/printer-scan-tool.exe",
-        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.1/printer-scan-tool.exe",
-        "https://ghproxy.com.cn/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.1/printer-scan-tool.exe",
-        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.1/printer-scan-tool.exe"
+        "https://printer-scan.knightlsy.cn/v4.6.2/printer-scan-tool.exe",
+        "https://printer-scan-cf-proxy.1292671633.workers.dev/v4.6.2/printer-scan-tool.exe",
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.2/printer-scan-tool.exe",
+        "https://ghproxy.com.cn/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.2/printer-scan-tool.exe",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.2/printer-scan-tool.exe"
       ]
     }
   ]
