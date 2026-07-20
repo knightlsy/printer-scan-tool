@@ -14,7 +14,7 @@ from dataclasses import dataclass, asdict, field
 # ---------------- 应用元信息 ----------------
 APP_NAME = "SCAN.GATE"
 APP_TITLE = "SCAN.GATE · 打印机扫描共享工具"
-VERSION = "4.6.1"
+VERSION = "4.6.2"
 AUTHOR = "刘思元"
 COPYRIGHT = "© 2026 刘思元. 版权所有"
 
@@ -24,6 +24,14 @@ LINK_EXTERNAL = "https://www.feishu.cn/invitation/page/add_contact/?token=499l92
 
 # 配置文件路径：沿用历史约定，放在用户主目录
 CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".printer_scan_config.json")
+
+# ---------------- 操作日志上报（集中到 Cloudflare Worker KV） ----------------
+# 会话审计日志在「本地共享目录兜底落盘」之外，同时上报到 Worker 集中存储，
+# 便于通过密码保护的查询页统一查看（https://printer-scan.knightlsy.cn/logs）。
+# LOG_INGEST_KEY 须与 Worker 的环境变量 INGEST_KEY 一致（仅用于写日志鉴权）。
+LOG_ENDPOINT = "https://printer-scan.knightlsy.cn"
+LOG_INGEST_KEY = "sg_ingest_e590f98784e06a3d"
+LOG_TO_WORKER = True
 
 
 @dataclass
