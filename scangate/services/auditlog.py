@@ -14,7 +14,10 @@
 
 import os
 import re
+import json
+import threading
 from datetime import datetime
+from urllib.request import Request, urlopen
 
 # 本机备份根目录（共享不可写时的兜底落盘位置）
 _LOCAL_AUDIT_ROOT = os.path.join(os.path.expanduser("~"), ".printer_scan_audit")
@@ -105,24 +108,88 @@ def write_session_log(
     content = "\n".join(lines) + "\n"
 
     # 1) 优先写共享目录
-    share_dir = _log_dir_for(host, share)
+    written = False
+    path = ""
     try:
+        share_dir = _log_dir_for(host, share)
         os.makedirs(share_dir, exist_ok=True)
         path = os.path.join(share_dir, fname)
         with open(path, "w", encoding="utf-8") as f:
             f.write(content)
-        return True, path
+        written = True
     except Exception:
         pass
 
-    # 2) 降级写本机备份
+    # 2) 共享目录不可写时降级写本机备份
+    if not written:
+        try:
+            local_dir = os.path.join(_LOCAL_AUDIT_ROOT, f"{_sanitize(host)}_{_sanitize(share)}")
+            os.makedirs(local_dir, exist_ok=True)
+            path = os.path.join(local_dir, fname)
+            with open(path, "w", encoding="utf-8") as f:
+                f.write("【本地备份】本次因无法写入共享日志目录，已记录到本机备份。\n")
+                f.write(content)
+        except Exception:
+            return False, ""
+
+    # 3) 同时上报到 Worker（集中存储 + 查询页）；后台线程、尽力而为，绝不阻塞主流程
     try:
-        local_dir = os.path.join(_LOCAL_AUDIT_ROOT, f"{_sanitize(host)}_{_sanitize(share)}")
-        os.makedirs(local_dir, exist_ok=True)
-        path = os.path.join(local_dir, fname)
-        with open(path, "w", encoding="utf-8") as f:
-            f.write("【本地备份】本次因无法写入共享日志目录，已记录到本机备份。\n")
-            f.write(content)
-        return False, path
+        from scangate.config import LOG_TO_WORKER
+        if LOG_TO_WORKER:
+            rec = _build_record(host, share, operator, account, start_dt, end_dt,
+                                server_unc, subfolder, ops, app_version)
+            threading.Thread(target=_upload_to_worker, args=(rec,), daemon=True).start()
     except Exception:
-        return False, ""
+        pass
+
+    return written, path
+
+
+def _build_record(host, share, operator, account, start_dt, end_dt,
+                  server_unc, subfolder, ops, app_version) -> dict:
+    """把会话日志整理成上报给 Worker 的结构化记录（精简掉长文本明细，保留可检索字段）。"""
+    return {
+        "start": _fmt(start_dt),
+        "end": _fmt(end_dt),
+        "operator": operator or "",
+        "account": account or "",
+        "server": server_unc or "",
+        "subfolder": subfolder or "",
+        "app_version": app_version or "SCAN.GATE",
+        "ops": [
+            {
+                "time": _fmt(op.get("time")),
+                "op_type": op.get("op_type", ""),
+                "description": (op.get("description") or "").strip(),
+                "target": op.get("target", "") or "",
+                "success": bool(op.get("success", True)),
+                "reason": op.get("reason", "") or "",
+            }
+            for op in (ops or [])
+        ],
+    }
+
+
+def _upload_to_worker(record: dict) -> None:
+    """把结构化会话日志 POST 到 Worker 的 /api/log（X-Log-Key 鉴权）。
+
+    任何异常都被吞掉：集中日志是「锦上添花」，绝不影响本地落盘与主业务。
+    """
+    try:
+        from scangate.config import LOG_ENDPOINT, LOG_INGEST_KEY
+        endpoint = (LOG_ENDPOINT or "").rstrip("/") + "/api/log"
+        if not endpoint:
+            return
+        data = json.dumps(record, ensure_ascii=False).encode("utf-8")
+        req = Request(
+            endpoint, data=data, method="POST",
+            headers={
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Log-Key": LOG_INGEST_KEY or "",
+                "User-Agent": "SCAN.GATE-Updater",
+            },
+        )
+        with urlopen(req, timeout=10) as r:
+            r.read()
+    except Exception:
+        pass
