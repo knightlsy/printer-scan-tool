@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SCAN.GATE 操作审计日志</title>
+<style>
+  :root { --bg:#0e1116; --panel:#161b22; --panel2:#1c2230; --line:#2a3140;
+          --txt:#e6edf3; --sub:#9aa7b4; --accent:#3fb6ff; --ok:#3fb950; --bad:#f85149; --warn:#d29922; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt);
+         font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif; }
+  header { display:flex; align-items:center; gap:12px; padding:16px 22px;
+           border-bottom:1px solid var(--line); background:var(--panel); }
+  header h1 { font-size:17px; margin:0; font-weight:600; }
+  header .tag { font-size:12px; color:var(--sub); }
+  .wrap { padding:18px 22px; max-width:1200px; margin:0 auto; }
+  .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:14px; }
+  input, button { font:inherit; }
+  .kw { flex:1; min-width:200px; padding:8px 12px; background:var(--panel2);
+        border:1px solid var(--line); border-radius:8px; color:var(--txt); outline:none; }
+  .kw:focus { border-color:var(--accent); }
+  button { padding:8px 14px; border:1px solid var(--line); border-radius:8px;
+           background:var(--panel2); color:var(--txt); cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); color:#06121d; border-color:var(--accent); font-weight:600; }
+  .stat { color:var(--sub); font-size:12px; margin-left:auto; }
+  table { width:100%; border-collapse:collapse; background:var(--panel); border-radius:10px; overflow:hidden; }
+  th, td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { background:var(--panel2); color:var(--sub); font-weight:600; font-size:12px; position:sticky; top:0; }
+  tbody tr { cursor:pointer; }
+  tbody tr:hover { background:var(--panel2); }
+  .op-count { display:inline-block; min-width:22px; text-align:center; padding:1px 7px;
+              border-radius:10px; background:var(--panel2); font-size:12px; }
+  .badge-ok { color:var(--ok); } .badge-bad { color:var(--bad); }
+  .detail { display:none; background:var(--panel2); }
+  .detail.open { display:table-row; }
+  .detail td { padding:0; }
+  .detail-inner { padding:10px 14px 14px 46px; }
+  .op { padding:6px 0; border-bottom:1px dashed var(--line); }
+  .op:last-child { border-bottom:none; }
+  .op .t { color:var(--sub); font-size:12px; }
+  .op .ty { color:var(--accent); font-weight:600; }
+  .op .ok { color:var(--ok); } .op .no { color:var(--bad); }
+  .empty { text-align:center; color:var(--sub); padding:40px; }
+  /* 口令遮罩 */
+  #gate { position:fixed; inset:0; background:rgba(6,10,16,.96); display:flex;
+          align-items:center; justify-content:center; z-index:50; }
+  #gate .box { background:var(--panel); border:1px solid var(--line); border-radius:14px;
+               padding:28px 30px; width:340px; text-align:center; }
+  #gate h2 { margin:0 0 6px; font-size:18px; }
+  #gate p { color:var(--sub); font-size:13px; margin:0 0 18px; }
+  #gate input { width:100%; padding:10px 12px; margin-bottom:12px; }
+  #gate .err { color:var(--bad); font-size:12px; min-height:16px; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="box">
+    <h2>日志查询</h2>
+    <p>请输入查看口令以访问操作审计日志</p>
+    <input id="key" type="password" placeholder="查看口令" autocomplete="off" />
+    <div class="err" id="gerr"></div>
+    <button class="primary" style="width:100%" onclick="unlock()">查看日志</button>
+  </div>
+</div>
+
+<header>
+  <h1>SCAN.GATE 操作审计日志</h1>
+  <span class="tag" id="sub">— 连接会话汇总 · 上报至 Cloudflare Worker</span>
+</header>
+<div class="wrap">
+  <div class="toolbar">
+    <input class="kw" id="kw" placeholder="筛选操作人 / 账号 / 服务器 / 文件名关键词…" oninput="applyFilter()" />
+    <button onclick="reload()">刷新</button>
+    <button id="more" onclick="loadMore()">加载更多</button>
+    <button onclick="exportCSV()">导出 CSV</button>
+    <span class="stat" id="stat"></span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:42px">#</th>
+        <th style="width:150px">结束时间</th>
+        <th style="width:96px">操作人</th>
+        <th style="width:140px">账号</th>
+        <th>服务器 / 子目录</th>
+        <th style="width:70px">操作数</th>
+        <th style="width:120px">版本</th>
+        <th style="width:130px">来源</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="empty" id="empty" style="display:none">暂无日志</div>
+</div>
+
+<script>
+const API = "/api/logs";
+let viewKey = sessionStorage.getItem("sg_log_key") || "";
+let all = [];          // 已加载的原始记录
+let cursor = null;     // 下一页游标
+let listComplete = false;
+
+if (viewKey) { tryUnlock(viewKey); }
+
+function unlock() {
+  const k = document.getElementById("key").value.trim();
+  if (!k) { document.getElementById("gerr").textContent = "请输入口令"; return; }
+  tryUnlock(k);
+}
+
+async function tryUnlock(k) {
+  document.getElementById("gerr").textContent = "验证中…";
+  try {
+    const r = await fetch(API + "?key=" + encodeURIComponent(k) + "&limit=30");
+    if (r.status === 401) { document.getElementById("gerr").textContent = "口令错误"; return; }
+    if (!r.ok) { document.getElementById("gerr").textContent = "服务异常 " + r.status; return; }
+    viewKey = k;
+    sessionStorage.setItem("sg_log_key", k);
+    document.getElementById("gate").style.display = "none";
+    await reload();
+  } catch (e) {
+    document.getElementById("gerr").textContent = "网络错误：" + e.message;
+  }
+}
+
+function authHeaders() { return { "Authorization": "Bearer " + viewKey }; }
+
+async function reload() {
+  all = []; cursor = null; listComplete = false;
+  document.getElementById("more").disabled = false;
+  await loadMore(true);
+}
+
+async function loadMore(reset) {
+  if (listComplete && !reset) return;
+  let url = API + "?key=" + encodeURIComponent(viewKey) + "&limit=30";
+  if (cursor) url += "&cursor=" + encodeURIComponent(cursor);
+  const r = await fetch(url, { headers: authHeaders() });
+  if (!r.ok) { document.getElementById("stat").textContent = "加载失败 " + r.status; return; }
+  const data = await r.json();
+  if (reset) all = [];
+  (data.entries || []).forEach(e => all.push(e));
+  cursor = data.cursor || null;
+  listComplete = !!data.list_complete;
+  if (listComplete) document.getElementById("more").disabled = true;
+  render();
+}
+
+function applyFilter() { render(); }
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function render() {
+  const kw = document.getElementById("kw").value.trim().toLowerCase();
+  const rows = document.getElementById("rows");
+  const filtered = all.filter(e => {
+    if (!kw) return true;
+    const hay = [e.operator, e.account, e.server, e.subfolder, e.app_version,
+                 (e.ops||[]).map(o=>o.description+" "+(o.target||"")).join(" ")]
+                .join(" ").toLowerCase();
+    return hay.includes(kw);
+  });
+  rows.innerHTML = "";
+  document.getElementById("empty").style.display = filtered.length ? "none" : "block";
+  document.getElementById("stat").textContent =
+    "已加载 " + all.length + " 条" + (kw ? "（筛选命中 " + filtered.length + "）" : "");
+  filtered.forEach((e, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>" + (all.length - i) + "</td>" +
+      "<td>" + esc(e.end) + "</td>" +
+      "<td>" + esc(e.operator) + "</td>" +
+      "<td>" + esc(e.account) + "</td>" +
+      "<td>" + esc(e.server) + (e.subfolder ? " \\ " + esc(e.subfolder) : "") + "</td>" +
+      "<td><span class='op-count'>" + (e.op_count||0) + "</span></td>" +
+      "<td>" + esc(e.app_version) + "</td>" +
+      "<td>" + esc(e.cf_ip) + (e.cf_country ? " (" + esc(e.cf_country) + ")" : "") + "</td>";
+    const dt = document.createElement("tr");
+    dt.className = "detail";
+    const ops = (e.ops||[]).map(o =>
+      "<div class='op'><span class='t'>" + esc(o.time) + "</span> · " +
+      "<span class='ty'>" + esc(o.op_type) + "</span> · " +
+      (o.success ? "<span class='ok'>成功</span>" : "<span class='no'>失败</span>") +
+      (o.reason ? " <span class='no'>（" + esc(o.reason) + "）</span>" : "") +
+      "<div>" + esc(o.description) + (o.target ? " → " + esc(o.target) : "") + "</div></div>"
+    ).join("") || "<div class='op'>（本会话无文件操作）</div>";
+    dt.innerHTML = "<td colspan='8'><div class='detail-inner'>" +
+      "<div class='op'>连接：" + esc(e.start) + " &nbsp;→&nbsp; 断开：" + esc(e.end) + "</div>" +
+      ops + "</div></td>";
+    tr.onclick = () => dt.classList.toggle("open");
+    rows.appendChild(tr); rows.appendChild(dt);
+  });
+}
+
+function exportCSV() {
+  const header = ["结束时间","操作人","账号","服务器","子目录","操作数","版本","来源IP","国家","操作明细"];
+  const lines = [header.join(",")];
+  all.forEach(e => {
+    const ops = (e.ops||[]).map(o =>
+      (o.time||"")+" "+(o.op_type||"")+" "+(o.description||"")+
+      (o.target?(" -> "+o.target):"")+(o.success?" 成功":" 失败"+(o.reason?("("+o.reason+")"):""))
+    ).join(" | ");
+    const row = [e.end, e.operator, e.account, e.server, e.subfolder, e.op_count,
+                 e.app_version, e.cf_ip, e.cf_country, ops];
+    lines.push(row.map(v => '"' + String(v==null?"":v).replace(/"/g,'""') + '"').join(","));
+  });
+  const blob = new Blob(["\ufeff" + lines.join("\n")], { type:"text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scan_gate_logs_" + new Date().toISOString().slice(0,10) + ".csv";
+  a.click();
+}
+</script>
+</body>
+</html>
