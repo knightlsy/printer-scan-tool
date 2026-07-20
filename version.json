@@ -1,15 +1,15 @@
 {
   "version": "4.7.0",
   "channel": "stable",
-  "published_at": "2026-07-20T15:00:36.205172+08:00",
-  "notes": "改为安装模式（onedir 打包）：主程序与依赖 DLL 同目录，启动直接读本地文件，不再临时解压到 %%TEMP%%，彻底规避 Windows Defender 对自解压 exe 加载临时 DLL 的拦截（Failed to load Python DLL）。首次运行自动安装到本机 %%LOCALAPPDATA%%\\Programs\\PrinterScanTool\\，并创建桌面与开始菜单快捷方式。auto-update 改为下载 zip 整体替换安装目录。",
+  "published_at": "2026-07-20T15:41:34.660152+08:00",
+  "notes": "安装模式（onedir 打包）：彻底规避 Defender 拦截加载临时 DLL；首次运行自动安装到本机并创建桌面/开始菜单快捷方式；auto-update 改为下载 zip 整体替换安装目录。",
   "min_version": "",
   "force": false,
   "files": [
     {
       "name": "printer-scan-tool.zip",
-      "size": 42342844,
-      "sha256": "cf4b284f4a70a12bcc6a8b1e20f4de591a10c66eef944fe8ed1349cedf6f578a",
+      "size": 42343120,
+      "sha256": "ddb37fb6e8342c0fa3086cc93576c030aa3e3421e237459de09256951b1cb026",
       "target": "self",
       "url": "https://printer-scan.knightlsy.cn/v4.7.0/printer-scan-tool.zip",
       "urls": [
