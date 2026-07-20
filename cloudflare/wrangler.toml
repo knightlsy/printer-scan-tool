@@ -1,0 +1,12 @@
+name = "printer-scan-cf-proxy"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+# 部署到 *.workers.dev（免费子域）。如需自定义域名（国内更稳），
+# 在 Cloudflare 控制台把你的域名(已接入 Cloudflare)添加为 Worker 路由/自定义域。
+workers_dev = true
+
+# 可选：绑定自定义域（把 yourdomain.com 换成你自己的、已接入 Cloudflare 的域名）
+# routes = [
+#   { pattern = "dl.yourdomain.com/*", custom_domain = true },
+# ]
