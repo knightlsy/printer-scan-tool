@@ -1,8 +1,8 @@
 /**
  * SCAN.GATE 综合 Worker（经典 Service Worker 格式）
  * ----------------------------------------------------------------------------
- * 1) 下载反代：把 GitHub Releases 上的 exe 经 Cloudflare 边缘分发（白名单
- *    /vX.Y.Z/*.exe，透传 Range 断点续传，边缘缓存完整下载）。
+ * 1) 下载反代：把 GitHub Releases 上的 exe / zip 经 Cloudflare 边缘分发
+ *    （白名单 /vX.Y.Z/*.exe 与 /vX.Y.Z/*.zip，透传 Range 断点续传，边缘缓存）。
  * 2) 操作审计日志：客户端在「连接会话」结束时把汇总日志 POST 到 /api/log，
  *    本 Worker 写入 KV（LOG_KV 绑定）。GET /api/logs（需 LOG_VIEW_KEY 口令）
  *    分页查询；GET /logs 提供密码保护的查询页面。
@@ -127,7 +127,7 @@ async function handleProxy(request) {
   const path = url.pathname.replace(/^\/+/, "");
   if (!path) {
     return new Response(
-      "SCAN.GATE CF Worker\n下载: /<tag>/<file>.exe  日志页: /logs",
+      "SCAN.GATE CF Worker\n下载: /<tag>/<file>.exe | /<tag>/<file>.zip  日志页: /logs",
       { status: 400, headers: { "Content-Type": "text/plain; charset=utf-8" } }
     );
   }
@@ -135,9 +135,10 @@ async function handleProxy(request) {
   const tag = seg[0] || "";
   const file = seg[seg.length - 1] || "";
   const tagOk = /^v\d+\.\d+\.\d+$/.test(tag);
-  const fileOk = file.toLowerCase().endsWith(".exe");
+  const low = file.toLowerCase();
+  const fileOk = low.endsWith(".exe") || low.endsWith(".zip");
   if (!tagOk || !fileOk) {
-    return new Response("仅允许下载本仓库的版本化 exe", { status: 403 });
+    return new Response("仅允许下载本仓库的版本化 exe / zip", { status: 403 });
   }
 
   const target = BASE + path;
