@@ -1,23 +1,23 @@
 {
-  "version": "4.6.0",
+  "version": "4.6.1",
   "channel": "stable",
-  "published_at": "2026-07-19T02:13:32.266172+08:00",
-  "notes": "升级主链切换为自定义域名 printer-scan.knightlsy.cn（Cloudflare 边缘加速，国内更快更稳），并保留 workers.dev 作为 Cloudflare 备用主机名；ghproxy 镜像与 GitHub 官方直链保底，静默下载安装。",
+  "published_at": "2026-07-20T11:21:03.871911+08:00",
+  "notes": "升级主链切换为自定义域名 printer-scan.knightlsy.cn（Cloudflare 边缘加速，国内更快更稳）；保留 workers.dev / ghproxy.net / ghproxy.com.cn / 官方直链多重保底。",
   "min_version": "",
   "force": false,
   "files": [
     {
-      "name": "打印机扫描工具_v4.exe",
-      "size": 42303611,
-      "sha256": "541e047e6d42d48e9df02e5c82784038724afccbe50d947881bdeaf47f46fe4f",
+      "name": "printer-scan-tool.exe",
+      "size": 42303603,
+      "sha256": "18fde2485963887e75c31172f520e020b547308e59827bd75e9184d87821c2e1",
       "target": "self",
-      "url": "https://printer-scan.knightlsy.cn/v4.6.0/printer-scan-tool.exe",
+      "url": "https://printer-scan.knightlsy.cn/v4.6.1/printer-scan-tool.exe",
       "urls": [
-        "https://printer-scan.knightlsy.cn/v4.6.0/printer-scan-tool.exe",
-        "https://printer-scan-cf-proxy.1292671633.workers.dev/v4.6.0/printer-scan-tool.exe",
-        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
-        "https://ghproxy.com.cn/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
-        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe"
+        "https://printer-scan.knightlsy.cn/v4.6.1/printer-scan-tool.exe",
+        "https://printer-scan-cf-proxy.1292671633.workers.dev/v4.6.1/printer-scan-tool.exe",
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.1/printer-scan-tool.exe",
+        "https://ghproxy.com.cn/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.1/printer-scan-tool.exe",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.1/printer-scan-tool.exe"
       ]
     }
   ]
