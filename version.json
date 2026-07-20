@@ -2,7 +2,7 @@
   "version": "4.6.0",
   "channel": "stable",
   "published_at": "2026-07-19T02:13:32.266172+08:00",
-  "notes": "升级地址改为 Cloudflare 边缘加速：客户端优先经 Cloudflare Worker 反代（全球骨干网，国内更快更稳）下载 exe，ghproxy 镜像与 GitHub 官方直链保底，静默下载安装。",
+  "notes": "升级主链切换为自定义域名 printer-scan.knightlsy.cn（Cloudflare 边缘加速，国内更快更稳），并保留 workers.dev 作为 Cloudflare 备用主机名；ghproxy 镜像与 GitHub 官方直链保底，静默下载安装。",
   "min_version": "",
   "force": false,
   "files": [
@@ -11,8 +11,9 @@
       "size": 42303611,
       "sha256": "541e047e6d42d48e9df02e5c82784038724afccbe50d947881bdeaf47f46fe4f",
       "target": "self",
-      "url": "https://printer-scan-cf-proxy.1292671633.workers.dev/v4.6.0/printer-scan-tool.exe",
+      "url": "https://printer-scan.knightlsy.cn/v4.6.0/printer-scan-tool.exe",
       "urls": [
+        "https://printer-scan.knightlsy.cn/v4.6.0/printer-scan-tool.exe",
         "https://printer-scan-cf-proxy.1292671633.workers.dev/v4.6.0/printer-scan-tool.exe",
         "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
         "https://ghproxy.com.cn/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.6.0/printer-scan-tool.exe",
