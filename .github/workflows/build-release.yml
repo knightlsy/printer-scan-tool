@@ -119,7 +119,8 @@ jobs:
           $dirty = git status --porcelain
           if ($dirty) {
             git commit -m "release v${{ steps.version.outputs.version }}: 更新 version.json"
-            git push origin ${{ github.ref }}
+            # 固定推送到 master 分支（tag 触发时 github.ref 是 refs/tags/*，不能作为推送目标）
+            git push origin HEAD:master
           } else {
             Write-Host "version.json 无改动，跳过提交"
           }
