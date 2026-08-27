@@ -55,8 +55,12 @@ fn render_pdf_page(
     if cancel.load(Ordering::Relaxed) {
         return Err("已取消".into());
     }
-    let pdf = pdfium_render::prelude::Pdfium::default()
-        .load_pdf_from_file(path, pdfium_render::prelude::PdfiumError::UNKNOWN)
+    // 初始化 pdfium（绑定系统 pdfium.dll）
+    let bindings = pdfium_render::prelude::Pdfium::bind_to_system_library()
+        .map_err(|e| format!("初始化 PDFium 失败: {e}"))?;
+    let pdfium = pdfium_render::prelude::Pdfium::new(bindings);
+    let pdf = pdfium
+        .load_pdf_from_file(path, None)
         .map_err(|e| format!("打开 PDF 失败: {e}"))?;
 
     let total = pdf.pages().len() as u32;

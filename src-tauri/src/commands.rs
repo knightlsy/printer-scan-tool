@@ -311,15 +311,11 @@ pub fn refresh(app: AppHandle, state: State<Mutex<AppState>>) {
 
 #[tauri::command]
 pub fn upload(app: AppHandle, state: State<Mutex<AppState>>) {
-    let win = app.get_webview_window("main").expect("main window");
-    let dialog = tauri_plugin_dialog::DialogExt::app(&app);
-    let result = dialog.blocking_file(
-        tauri_plugin_dialog::Message::new("选择要上传的文件"),
-        tauri_plugin_dialog::FileDialogKind::Open,
-    );
-    let paths = match result {
-        Ok(Some(p)) => p,
-        _ => {
+    use tauri_plugin_dialog::DialogExt;
+    let picked = app.dialog().file().blocking_pick_files();
+    let paths = match picked {
+        Some(v) => v.into_iter().map(|p| format!("{p}")).collect::<Vec<_>>(),
+        None => {
             let _ = emit(
                 &app,
                 "onStatus",
@@ -328,7 +324,6 @@ pub fn upload(app: AppHandle, state: State<Mutex<AppState>>) {
             return;
         }
     };
-    drop(win);
 
     let st = state.lock().unwrap();
     let cfg = crate::smb::to_config(&st.active_profile());
@@ -399,14 +394,11 @@ pub fn download(app: AppHandle, state: State<Mutex<AppState>>, path: String) {
         .map(|n| n.to_string_lossy().to_string())
         .unwrap_or("download".into());
 
-    let dialog = tauri_plugin_dialog::DialogExt::app(&app);
-    let result = dialog.blocking_file(
-        tauri_plugin_dialog::Message::new("选择保存位置"),
-        tauri_plugin_dialog::FileDialogKind::Save,
-    );
-    let dest = match result {
-        Ok(Some(p)) => p,
-        _ => return,
+    use tauri_plugin_dialog::DialogExt;
+    let picked = app.dialog().file().blocking_save_file();
+    let dest = match picked {
+        Some(p) => format!("{p}"),
+        None => return,
     };
 
     let st = state.lock().unwrap();
@@ -523,13 +515,14 @@ pub fn preview(app: AppHandle, state: State<Mutex<AppState>>, path: String, page
 
 #[tauri::command]
 pub fn pick_pdf(app: AppHandle) {
-    let dialog = tauri_plugin_dialog::DialogExt::app(&app);
-    let result = dialog.blocking_file(
-        tauri_plugin_dialog::Message::new("选择要压缩的 PDF 文件"),
-        tauri_plugin_dialog::FileDialogKind::Open,
-    );
-    if let Ok(Some(paths)) = result {
-        let first = paths.first().map(|p| p.clone()).unwrap_or_default();
+    use tauri_plugin_dialog::DialogExt;
+    let picked = app
+        .dialog()
+        .file()
+        .add_filter("PDF 文件", &["pdf"])
+        .blocking_pick_file();
+    if let Some(first) = picked {
+        let first = format!("{first}");
         let _ = emit(&app, "onPickPdf", &serde_json::json!({"path": first}));
     } else {
         let _ = emit(
