@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  RUST_VERSION: '1.77'
+  RUST_VERSION: '1.85'
   TAURI_VERSION: 'v2'
 
 jobs:
