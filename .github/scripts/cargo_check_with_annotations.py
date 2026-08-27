@@ -1,9 +1,10 @@
-"""ci-helper: 运行 cargo check，写日志，输出 ::error annotation。"""
+"""ci-helper: 运行 cargo check，写日志，输出 ::error annotation 到 stdout。"""
 import subprocess, sys, os
 
 log_path = os.path.join(os.environ.get("WORKSPACE", "."), "rust-check.log")
 summary_path = os.environ.get("GITHUB_STEP_SUMMARY", "")
 
+# 运行 cargo check，捕获 stdout/stderr
 proc = subprocess.Popen(
     ["cargo", "check"],
     cwd="src-tauri",
@@ -17,30 +18,42 @@ lines = []
 for line in proc.stdout:
     line = line.rstrip("\n")
     lines.append(line)
+    # 逐行输出到 stdout（GitHub workflow command 从这里读取）
     print(line, flush=True)
 
 proc.wait()
 rc = proc.returncode
 
-# 写文件
+# 写文件日志
 with open(log_path, "w", encoding="utf-8") as f:
     f.write("\n".join(lines) + "\n")
 
-# 写 step summary
+# 写 step summary（便于网页查看）
 if summary_path:
     with open(summary_path, "a", encoding="utf-8") as f:
+        f.write("\n## Rust 编译诊断\n\n```\n")
         f.write("\n".join(lines) + "\n")
+        f.write("```\n\n")
 
-# cargo 失败时，把所有含 error 的行发 annotation（用原始 bytes 输出）
+# cargo 失败时，把关键错误行输出为 ::error annotation
 if rc != 0:
     seen = set()
     for line in lines:
         low = line.lower()
-        if "error" in low and line not in seen:
+        # 匹配 cargo 错误输出特征
+        is_err = (
+            "error[" in low           # error[E0xxx]
+            or "error:" in low         # "error: ..."
+            or "--> " in line          # --> file.rs:123
+            or line.startswith("error")  # 行首 error
+        )
+        if is_err and line not in seen:
             seen.add(line)
-            # 用原始 bytes 写 stdout，确保 GitHub 识别
-            ann = f"::error::{line}\n"
-            sys.stdout.buffer.write(ann.encode("utf-8"))
-            sys.stdout.flush()
+            # 用最简单格式：::error title=...::message
+            # 不指定 file/line，避免格式错误被忽略
+            title = "cargo-error"
+            msg = line[:255]  # 限制长度
+            ann = f"::error title={title}::{msg}"
+            print(ann, flush=True)
 
 sys.exit(rc)
