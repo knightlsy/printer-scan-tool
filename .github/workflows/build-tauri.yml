@@ -72,7 +72,21 @@ jobs:
           $output | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding UTF8
           $last = $output | Select-Object -Last 80
           $last | ForEach-Object { Write-Output $_ }
-          if ($LASTEXITCODE -ne 0) { exit 1 }
+          if ($LASTEXITCODE -ne 0) {
+            # 把日志推送回仓库，方便本机读取
+            $log = Get-Content ../rust-check.log -Raw
+            $errorLines = $output | Select-String "error\[" | ForEach-Object { $_.Line }
+            git -C .. config user.name "github-actions[bot]"
+            git -C .. config user.email "github-actions[bot]@users.noreply.github.com"
+            git -C .. checkout -B ci-log
+            git -C .. rm -f ci-rust-check.log
+            git -C .. add ../rust-check.log 2>$null
+            $log | Set-Content ../ci-rust-check.log -Encoding UTF8
+            git -C .. add ci-rust-check.log
+            git -C .. commit -m "ci-log: 最新 cargo check 日志"
+            git -C .. push origin HEAD:ci-log --force
+            exit 1
+          }
 
       - name: 上传诊断日志
         uses: actions/upload-artifact@v4
