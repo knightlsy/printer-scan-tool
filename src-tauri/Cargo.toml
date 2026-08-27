@@ -5,7 +5,7 @@ description = "SCAN.GATE 打印机扫描共享工具"
 authors = ["knightlsy"]
 edition = "2021"
 license = "MIT"
-rust-version = "1.85"
+rust-version = "1.88"
 
 [lib]
 name = "scangate_lib"
