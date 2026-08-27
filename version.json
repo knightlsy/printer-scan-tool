@@ -1,24 +1,22 @@
 {
-  "version": "4.7.0",
-  "channel": "stable",
-  "published_at": "2026-07-20T15:41:34.660152+08:00",
-  "notes": "安装模式（onedir 打包）：彻底规避 Defender 拦截加载临时 DLL；首次运行自动安装到本机并创建桌面/开始菜单快捷方式；auto-update 改为下载 zip 整体替换安装目录。",
-  "min_version": "",
-  "force": false,
+  "notes": "自动构建：onedir 打包，Defender 兼容",
   "files": [
     {
-      "name": "printer-scan-tool.zip",
-      "size": 42343120,
-      "sha256": "ddb37fb6e8342c0fa3086cc93576c030aa3e3421e237459de09256951b1cb026",
-      "target": "self",
-      "url": "https://printer-scan.knightlsy.cn/v4.7.0/printer-scan-tool.zip",
+      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.7.1/printer-scan-tool.zip",
       "urls": [
-        "https://printer-scan.knightlsy.cn/v4.7.0/printer-scan-tool.zip",
-        "https://printer-scan-cf-proxy.1292671633.workers.dev/v4.7.0/printer-scan-tool.zip",
-        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.7.0/printer-scan-tool.zip",
-        "https://ghproxy.com.cn/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.7.0/printer-scan-tool.zip",
-        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.7.0/printer-scan-tool.zip"
-      ]
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.7.1/printer-scan-tool.zip",
+        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.7.1/printer-scan-tool.zip",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.7.1/printer-scan-tool.zip"
+      ],
+      "size": 76217787,
+      "sha256": "d845c9d57d88735fca0476a672311bd7d6c39d588ad5761a82d3857cfdb8e0ae",
+      "name": "printer-scan-tool.zip",
+      "target": "self"
     }
-  ]
+  ],
+  "published_at": "2026-08-27T04:17:36.868837Z",
+  "channel": "stable",
+  "version": "4.7.1",
+  "force": false,
+  "min_version": ""
 }
