@@ -1,0 +1,112 @@
+name: build-tauri
+
+# 触发：推送 v* 标签 或 手动运行
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（不带 v，如 4.8.0）'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  RUST_VERSION: '1.77'
+  TAURI_VERSION: 'v2'
+
+jobs:
+  build:
+    name: Build Tauri (Windows)
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            arch: x64
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: ${{ matrix.target }}
+
+      - name: 安装 Windows 构建工具
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Rust 依赖缓存
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 'src-tauri'
+
+      - name: 设置 Node.js（Tauri v2 需要 node 处理前端）
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 生成 256 图标（若缺失）
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "src-tauri/icons/256x256.png")) {
+            Write-Host "生成 256 图标占位（应提前放进仓库）"
+          }
+          # Tauri v2 至少需要 32x32 + 256x256，128x128@2x 已存在
+          Copy-Item "src-tauri/icons/128x128.png" "src-tauri/icons/256x256.png" -Force
+
+      - name: 验证 Rust 编译
+        run: |
+          cd src-tauri
+          cargo build --release --target ${{ matrix.target }}
+
+      - name: Tauri 打包（msi + nsis 任选）
+        shell: pwsh
+        run: |
+          cd src-tauri
+          # Tauri CLI
+          npx tauri build --target ${{ matrix.target }}
+        env:
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+
+      - name: 计算版本号
+        id: version
+        shell: pwsh
+        run: |
+          $v = "${{ github.event.inputs.version }}"
+          if (-not $v) {
+            $v = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          }
+          if (-not $v) { $v = "4.8.0" }
+          Write-Host "version=$v"
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "tag=v$v" >> $env:GITHUB_OUTPUT
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCAN.GATE-${{ steps.version.outputs.version }}-x64
+          path: src-tauri/target/${{ matrix.target }}/release/bundle/*
+          if-no-files-found: error
+
+      - name: 创建 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "SCAN.GATE Tauri v${{ steps.version.outputs.version }}"
+          body: |
+            ## SCAN.GATE v${{ steps.version.outputs.version }}（Tauri 桌面版）
+
+            - Rust + Tauri v2 构建
+            - 零 Python 依赖
+          files: |
+            src-tauri/target/${{ matrix.target }}/release/bundle/*
+          generate_release_notes: false

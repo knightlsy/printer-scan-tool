@@ -37,3 +37,8 @@ _e2e*.py
 vendor/webview2/runtime/
 vendor/webview2/
 vendor/
+
+# Tauri 构建产物
+src-tauri/target/
+src-tauri/.cargo/
+

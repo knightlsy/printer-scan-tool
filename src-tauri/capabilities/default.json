@@ -1,0 +1,20 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "SCAN.GATE 主窗口默认权限",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    {
+      "identifier": "shell:allow-open",
+      "allow": [
+        {
+          "name": "https://*",
+          "args": true
+        }
+      ]
+    },
+    "dialog:default",
+    "updater:default"
+  ]
+}
