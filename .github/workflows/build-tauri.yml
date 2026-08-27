@@ -67,7 +67,7 @@ jobs:
         shell: pwsh
         run: |
           cd ${{ github.workspace }}
-          # 用 Python 脚本跑 cargo check，逐行输出 ::error annotation
+          Write-Output "::error title=test-annotation::THIS IS A TEST ANNOTATION"
           python3 .github/scripts/cargo_check_with_annotations.py
           if ($LASTEXITCODE -ne 0) {
             Write-Host "cargo check 失败 ❌"
