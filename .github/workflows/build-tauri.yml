@@ -66,9 +66,11 @@ jobs:
 
       - name: 验证 Rust 编译（cargo check，不链接）
         shell: pwsh
+        env:
+          WORKSPACE: ${{ github.workspace }}
+          GITHUB_STEP_SUMMARY: ${{ github.step_summary }}
         run: |
           cd ${{ github.workspace }}
-          Write-Output "::error title=test-annotation::THIS IS A TEST ANNOTATION"
           python3 .github/scripts/cargo_check_with_annotations.py
           if ($LASTEXITCODE -ne 0) {
             Write-Host "cargo check 失败 ❌"
