@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  checks: write  # ::error annotation 需要写 check runs
 
 env:
   RUST_VERSION: 'stable'
