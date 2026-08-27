@@ -77,11 +77,11 @@ jobs:
           # 输出最后 100 行到终端（CI log 可见）
           $result | Select-Object -Last 100 | ForEach-Object { Write-Output $_ }
           if ($rc -ne 0) {
-            # 遍历所有行，挑 error 行发 annotation
-            foreach ($line in $result) {
-              $l = [string]$line
-              if ($l -match "error\[" -or $l -match "error:" -or $l -match "--->") {
-                $s = $l.Substring(0,[Math]::Min($l.Length,500))
+            # $result 在 PowerShell 里是单个 String，必须 -split "\n" 拆行
+            $lines = $result -split "`n"
+            foreach ($line in $lines) {
+              if ($line -match "error\[" -or $line -match "error:" -or $line -match "--->") {
+                $s = $line.Substring(0,[Math]::Min($line.Length,500))
                 Write-Output "::error::$s"
               }
             }
