@@ -1,4 +1,4 @@
-"""ci-helper: 运行 cargo check，写日志，输出所有含 error 的行作为 annotation。"""
+"""ci-helper: 运行 cargo check，写日志，输出 ::error annotation。"""
 import subprocess, sys, os
 
 log_path = os.path.join(os.environ.get("WORKSPACE", "."), "rust-check.log")
@@ -31,15 +31,16 @@ if summary_path:
     with open(summary_path, "a", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
-# cargo 失败时，把所有含 error 的行发 annotation
+# cargo 失败时，把所有含 error 的行发 annotation（用原始 bytes 输出）
 if rc != 0:
     seen = set()
     for line in lines:
         low = line.lower()
-        # 匹配各种 error 格式
         if "error" in low and line not in seen:
             seen.add(line)
-            safe = line[:500]
-            print(f"::error::{line}", flush=True)
+            # 用原始 bytes 写 stdout，确保 GitHub 识别
+            ann = f"::error::{line}\n"
+            sys.stdout.buffer.write(ann.encode("utf-8"))
+            sys.stdout.flush()
 
 sys.exit(rc)
