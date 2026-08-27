@@ -66,36 +66,23 @@ jobs:
         shell: pwsh
         run: |
           cd src-tauri
-          $ErrorActionPreference = "Continue"
-          $output = (cargo check 2>&1)
-          $output | Out-File -FilePath ../rust-check.log -Encoding UTF8
-          $output | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding UTF8
-          $last = $output | Select-Object -Last 80
-          $last | ForEach-Object { Write-Output $_ }
-          if ($LASTEXITCODE -ne 0) {
-            # 用 ::error annotation 输出错误行，GitHub UI 和 API 都能看到
-            $errLines = $output | Select-String "^\s*error\[|^\s*--->|^\s*error:"
-            $firstFile = ""
-            foreach ($line in $errLines) {
-              if ($firstFile -eq "" -and $line.Line -match "--->\s+(.+):(\d+)") {
-                $firstFile = $Matches[1]
-                $firstLine = $Matches[2]
-                Write-Output "::error file=$firstFile,line=$firstLine::cargo error"
-              }
-              Write-Output "::error::$($line.Line.Substring(0,[Math]::Min($line.Line.Length,500)))"
+          $env:RUST_BACKTRACE = "0"
+          # 运行 cargo check，输出同时去终端和文件
+          $result = & cargo check 2>&1
+          $rc = $LASTEXITCODE
+          # 写入文件
+          $result | Out-File -FilePath ../rust-check.log -Encoding UTF8
+          # 写进 step summary
+          $result | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding UTF8
+          # 输出最后 80 行到终端（CI log 可见）
+          $result | Select-Object -Last 80 | ForEach-Object { Write-Output $_ }
+          if ($rc -ne 0) {
+            # 抽错误行发 annotation
+            $errs = ($result | Select-String "error\[|error:|--->") | Select-Object -Last 50
+            $errs | ForEach-Object {
+              $s = $_.Line.Substring(0,[Math]::Min($_.Line.Length,500))
+              Write-Output "::error::$s"
             }
-            # 尝试 GITHUB_TOKEN 认证 push 日志到 master
-            $log = Get-Content ../rust-check.log -Raw
-            New-Item -ItemType Directory -Force -Path ci-logs | Out-Null
-            $log | Set-Content ci-logs/latest.log -Encoding UTF8
-            $remote = "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/knightlsy/printer-scan-tool.git"
-            git -C .. config user.name "github-actions[bot]"
-            git -C .. config user.email "github-actions[bot]@users.noreply.github.com"
-            git -C .. fetch origin master --depth=100
-            git -C .. checkout -B ci-log-push origin/master
-            git -C .. add ci-logs/latest.log
-            git -C .. commit -m "ci-log: cargo check 日志" 2>&1
-            git -C .. push $remote ci-log-push:master 2>&1
             exit 1
           }
 
