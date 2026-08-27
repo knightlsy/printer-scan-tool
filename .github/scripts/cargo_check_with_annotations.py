@@ -1,4 +1,4 @@
-"""ci-helper: 运行 cargo check，写日志，输出 ::error annotation 到 stderr。"""
+"""ci-helper: 运行 cargo check，写日志，输出 ::error annotation 到 stdout。"""
 import subprocess, sys, os
 
 log_path = os.path.join(os.environ.get("WORKSPACE", "."), "rust-check.log")
@@ -17,13 +17,13 @@ lines = []
 for line in proc.stdout:
     line = line.rstrip("\n")
     lines.append(line)
-    # cargo 正常输出到 stdout（CI log 可见）
+    # cargo 正常输出到 stdout
     print(line)
-    # ::error annotation 必须发到 stderr，GitHub 才能识别为 workflow command
+    # ::error annotation 也输出到 stdout（GitHub workflow command 要求）
     low = line.lower()
     if "error[" in low or "error:" in low or "--->" in low:
         safe = line[:500]
-        print(f"::error::{safe}", file=sys.stderr)
+        print(f"::error::{safe}", flush=True)
 
 proc.wait()
 rc = proc.returncode
