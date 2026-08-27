@@ -23,7 +23,7 @@ fn drop_cancel(state: &AppState, task_id: &str) {
     state.cancels.lock().unwrap().remove(task_id);
 }
 
-fn emit(app: &AppHandle, event: &str, payload: impl serde::Serialize) {
+fn emit(app: &AppHandle, event: &str, payload: impl serde::Serialize + Clone) {
     let _ = app.emit(event, payload);
 }
 
@@ -314,7 +314,13 @@ pub fn upload(app: AppHandle, state: State<Mutex<AppState>>) {
     use tauri_plugin_dialog::DialogExt;
     let picked = app.dialog().file().blocking_pick_files();
     let paths = match picked {
-        Some(v) => v.into_iter().map(|p| format!("{p}")).collect::<Vec<_>>(),
+        Some(v) => v
+            .into_iter()
+            .map(|fp| match fp.into_path() {
+                Ok(pb) => pb.to_string_lossy().to_string(),
+                Err(_) => String::new(),
+            })
+            .collect::<Vec<_>>(),
         None => {
             let _ = emit(
                 &app,
@@ -397,7 +403,10 @@ pub fn download(app: AppHandle, state: State<Mutex<AppState>>, path: String) {
     use tauri_plugin_dialog::DialogExt;
     let picked = app.dialog().file().blocking_save_file();
     let dest = match picked {
-        Some(p) => format!("{p}"),
+        Some(p) => match p.into_path() {
+            Ok(pb) => pb.to_string_lossy().to_string(),
+            Err(_) => return,
+        },
         None => return,
     };
 
@@ -522,7 +531,10 @@ pub fn pick_pdf(app: AppHandle) {
         .add_filter("PDF 文件", &["pdf"])
         .blocking_pick_file();
     if let Some(first) = picked {
-        let first = format!("{first}");
+        let first = match first.into_path() {
+            Ok(pb) => pb.to_string_lossy().to_string(),
+            Err(_) => return,
+        };
         let _ = emit(&app, "onPickPdf", &serde_json::json!({"path": first}));
     } else {
         let _ = emit(
