@@ -8,38 +8,38 @@
    ========================================================================= */
 
 :root {
-  /* —— 统一冷色系（背景与玻璃同源，无色差）—— */
-  --bg-1: #eef2f9;   /* 顶部冷白 */
-  --bg-2: #e4ebf5;   /* 中部 */
-  --bg-3: #d8e2f2;   /* 底部略深冷灰 */
-  --bg-base: #e7edf6;
+  /* —— 统一冷色系（与桌面端 scangate/ui/theme.py 一致）—— */
+  --bg-1: #fbfcfe;   /* 顶部冷白（BG_TOP） */
+  --bg-2: #eef1f7;   /* 中部（BG_MID） */
+  --bg-3: #e3e8f1;   /* 底部略深冷灰（BG_BOT） */
+  --bg-base: #eef1f7;
 
   /* 玻璃：白色半透明 + 冷调描边，与背景同色相 → 无割裂感 */
   --glass: rgba(255, 255, 255, 0.55);
-  --glass-strong: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(255, 255, 255, 0.62);
+  --glass-strong: rgba(255, 255, 255, 0.74);
+  --glass-border: rgba(195, 201, 216, 0.62);   /* GLASS_BORDER #c3c9d8 */
   --glass-shadow: 0 10px 34px rgba(31, 38, 85, 0.12);
   --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
-  /* 文字（冷调近黑，满足对比度） */
-  --text: #1c2230;
-  --text-dim: #5b6478;
-  --text-faint: #828ca3;
+  /* 文字（冷调近黑，满足对比度；对齐 theme.py） */
+  --text: #1d1d1f;       /* TEXT */
+  --text-dim: #51545e;   /* TEXT_DIM */
+  --text-faint: #6b6f7a; /* TEXT_FAINT */
 
-  /* 主色：冷蓝，与整体一致 */
-  --accent: #2f6bff;
-  --accent-hi: #5689ff;
-  --accent-press: #1f54e0;
-  --accent-soft: rgba(47, 107, 255, 0.12);
+  /* 主色：对齐桌面端 Apple 系统蓝系（theme.py ACCENT 族） */
+  --accent: #0a6cf0;
+  --accent-hi: #2f83f5;
+  --accent-press: #0858c7;
+  --accent-soft: rgba(10, 108, 240, 0.12);
 
-  /* 语义色（统一冷暖协调） */
-  --danger: #ff4d4f;
-  --danger-hi: #ff6b6d;
-  --danger-press: #e03234;
-  --danger-soft: rgba(255, 77, 79, 0.12);
-  --success: #1fa463;
-  --warn: #d98a00;
-  --idle: #8b93a7;
+  /* 语义色（对齐 theme.py：DANGER/SUCCESS/WARNING） */
+  --danger: #ff3b30;
+  --danger-hi: #ff453a;
+  --danger-press: #e0352b;
+  --danger-soft: rgba(255, 59, 48, 0.12);
+  --success: #1f9d4d;
+  --warn: #c77700;
+  --idle: #6b6f7a;
 
   /* 圆角 / 间距 / 动效 */
   --radius-lg: 22px;
@@ -147,7 +147,7 @@ html, body {
 }
 .conn-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--idle); transition: background var(--dur) var(--ease); }
 .conn-dot.on { background: var(--success); }       /* 已连接：绿色 */
-.conn-dot.off { background: var(--danger); box-shadow: 0 0 0 4px rgba(255,77,79,0.18); }  /* 已断开：红色 */
+.conn-dot.off { background: var(--danger); box-shadow: 0 0 0 4px rgba(255,59,48,0.18); }  /* 已断开：红色 */
 
 /* 拖拽区：仅 .title-drag（带 pywebview-drag-region）可拖拽。
    user-select:none 避免拖动时选中品牌文字；cursor:default 给无边框窗口更自然的观感。 */
@@ -218,7 +218,7 @@ body.is-max .rz { pointer-events: none; }
 }
 .status-dot.success { background: var(--success); box-shadow: 0 0 0 5px rgba(31,164,99,0.18); }
 .status-dot.warn    { background: var(--warn);    box-shadow: 0 0 0 5px rgba(217,138,0,0.18); }
-.status-dot.error   { background: var(--danger);  box-shadow: 0 0 0 5px rgba(255,77,79,0.18); }
+.status-dot.error   { background: var(--danger);  box-shadow: 0 0 0 5px rgba(255,59,48,0.18); }
 .status-text {
   font-size: clamp(18px, 2.2vw, 30px);  /* 随分辨率平滑缩放 */
   font-weight: 600;
@@ -306,9 +306,9 @@ body.is-max .rz { pointer-events: none; }
   color: #fff;
   background: linear-gradient(180deg, var(--accent-hi), var(--accent));
   border-color: transparent;
-  box-shadow: 0 6px 16px rgba(47,107,255,0.28);
+  box-shadow: 0 6px 16px rgba(10,108,240,0.28);
 }
-.btn-primary:hover { background: linear-gradient(180deg, #6f9bff, var(--accent-hi)); }
+.btn-primary:hover { background: linear-gradient(180deg, var(--accent), var(--accent-hi)); }
 .btn-primary:active { background: linear-gradient(180deg, var(--accent), var(--accent-press)); }
 .btn-secondary {
   color: var(--text);
@@ -319,9 +319,9 @@ body.is-max .rz { pointer-events: none; }
   color: #fff;
   background: linear-gradient(180deg, var(--danger-hi), var(--danger));
   border-color: transparent;
-  box-shadow: 0 6px 16px rgba(255,77,79,0.26);
+  box-shadow: 0 6px 16px rgba(255,59,48,0.26);
 }
-.btn-danger:hover { background: linear-gradient(180deg, #ff7d7f, var(--danger-hi)); }
+.btn-danger:hover { background: linear-gradient(180deg, var(--danger), var(--danger-hi)); }
 .btn-danger:active { background: linear-gradient(180deg, var(--danger), var(--danger-press)); }
 .btn-ghost {
   color: var(--accent);
@@ -364,8 +364,8 @@ body.is-max .rz { pointer-events: none; }
   cursor: pointer;
   transition: background var(--dur) var(--ease);
 }
-.list-row:hover { background: rgba(47,107,255,0.08); }
-.list-row.selected { background: rgba(47,107,255,0.16); box-shadow: inset 3px 0 0 var(--accent); }
+.list-row:hover { background: rgba(10,108,240,0.08); }
+.list-row.selected { background: rgba(10,108,240,0.16); box-shadow: inset 3px 0 0 var(--accent); }
 .list-row.dir .col-name { color: var(--accent); font-weight: 600; }
 .col-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .col-size, .col-time { color: var(--text-dim); font-size: 13px; }
@@ -683,7 +683,7 @@ body.is-max .rz { pointer-events: none; }
 }
 .upd-progress {
   height: 8px; border-radius: 999px;
-  background: rgba(47,107,255,0.12); overflow: hidden;
+  background: rgba(10,108,240,0.12); overflow: hidden;
 }
 .upd-progress-bar {
   height: 100%; width: 0%;
