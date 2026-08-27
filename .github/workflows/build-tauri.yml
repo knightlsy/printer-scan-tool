@@ -62,10 +62,19 @@ jobs:
           # Tauri v2 至少需要 32x32 + 256x256，128x128@2x 已存在
           Copy-Item "src-tauri/icons/128x128.png" "src-tauri/icons/256x256.png" -Force
 
-      - name: 验证 Rust 编译
+      - name: 验证 Rust 编译（cargo check，不链接）
+        shell: pwsh
         run: |
           cd src-tauri
-          cargo build --release --target ${{ matrix.target }}
+          $ErrorActionPreference = "Stop"
+          cargo check 2>&1 | Tee-Object -FilePath ../rust-check.log
+
+      - name: 上传诊断日志
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: rust-check-log
+          path: rust-check.log
 
       - name: Tauri 打包（msi + nsis 任选）
         shell: pwsh
