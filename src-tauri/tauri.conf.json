@@ -47,11 +47,7 @@
           "SimpChinese",
           "English"
         ],
-        "displayLanguageSelector": true,
-        "installerLanguages": [
-          "SimpChinese",
-          "English"
-        ]
+        "displayLanguageSelector": true
       }
     }
   },
