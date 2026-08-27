@@ -73,18 +73,15 @@ jobs:
           $last = $output | Select-Object -Last 80
           $last | ForEach-Object { Write-Output $_ }
           if ($LASTEXITCODE -ne 0) {
-            # 把日志推送回仓库，方便本机读取
+            # 把日志写进仓库 ci-logs/ 目录并 push 到 master，本机可 git pull 读取
             $log = Get-Content ../rust-check.log -Raw
-            $errorLines = $output | Select-String "error\[" | ForEach-Object { $_.Line }
+            New-Item -ItemType Directory -Force -Path ci-logs | Out-Null
+            $log | Set-Content ci-logs/latest.log -Encoding UTF8
             git -C .. config user.name "github-actions[bot]"
             git -C .. config user.email "github-actions[bot]@users.noreply.github.com"
-            git -C .. checkout -B ci-log
-            git -C .. rm -f ci-rust-check.log
-            git -C .. add ../rust-check.log 2>$null
-            $log | Set-Content ../ci-rust-check.log -Encoding UTF8
-            git -C .. add ci-rust-check.log
+            git -C .. add ci-logs/latest.log
             git -C .. commit -m "ci-log: 最新 cargo check 日志"
-            git -C .. push origin HEAD:ci-log --force
+            git -C .. push origin HEAD:master
             exit 1
           }
 
