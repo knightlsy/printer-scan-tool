@@ -66,8 +66,13 @@ jobs:
         shell: pwsh
         run: |
           cd src-tauri
-          $ErrorActionPreference = "Stop"
-          cargo check 2>&1 | Tee-Object -FilePath ../rust-check.log
+          $ErrorActionPreference = "Continue"
+          $output = (cargo check 2>&1)
+          $output | Out-File -FilePath ../rust-check.log -Encoding UTF8
+          $output | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding UTF8
+          $last = $output | Select-Object -Last 80
+          $last | ForEach-Object { Write-Output $_ }
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: 上传诊断日志
         uses: actions/upload-artifact@v4
