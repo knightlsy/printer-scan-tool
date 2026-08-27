@@ -1,2 +1,8 @@
+# SCAN.GATE 运行依赖（均需联网安装）
+# 桌面版：customtkinter + Pillow（PIL 用于毛玻璃背景/预览）
+# Web 混合版：pywebview（HTML/CSS 前端容器，main_web.py 使用）
+# PDF 预览/压缩：PyMuPDF（fitz，惰性导入，缺失时功能降级提示）
 customtkinter>=5.2
 Pillow>=10.0
+pywebview>=5.0
+PyMuPDF>=1.24
