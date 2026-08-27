@@ -32,7 +32,7 @@ from scangate.services.connection import connect, disconnect
 from scangate.services.files import list_files, upload, download, delete
 from scangate.services.preview import make_preview
 from scangate.services.compress import compress, human as _human_size
-from scangate.services.auditlog import write_session_log
+from scangate.services.session import SessionRecorder
 from scangate.updater import Updater
 from scangate.updater.settings import load_settings as _load_update_settings, set_prefs as _set_update_prefs
 
@@ -69,7 +69,12 @@ class Api:
         self._maximized = False        # 无边框窗口的最大化状态（用于切换）
         # 操作人：优先用配置里填写的姓名，否则回退到本机登录账号
         self.operator = self.cm.operator or self._windows_account()
-        self._session = None           # 当前连接会话审计记录（连接时建立，断开/关闭时落盘）
+        # 连接会话审计记录器（连接时 begin，断开/关闭时 flush）
+        self._rec = SessionRecorder(
+            operator=self.cm.operator,
+            account=self._windows_account(),
+            app_version=f"{APP_NAME} v{VERSION}",
+        )
         self._updater = None           # 最近一次 Updater 实例（缓存检测到的清单）
 
     # ---------------- 连接会话审计日志 ----------------
@@ -88,45 +93,23 @@ class Api:
 
         会话断开 / 关闭窗口时，这些记录会汇总成唯一一条日志写入共享 log 目录。
         """
-        if not self._session:
-            return
-        self._session["ops"].append({
-            "time": datetime.now(),
-            "op_type": op_type,
-            "description": description,
-            "target": target,
-            "before_state": before_state,
-            "after_state": after_state,
-            "success": success,
-            "reason": reason,
-            "detail": detail,
-        })
+        self._rec.record(
+            op_type=op_type,
+            description=description,
+            target=target,
+            before_state=before_state,
+            after_state=after_state,
+            success=success,
+            reason=reason,
+            detail=detail,
+        )
 
     def _flush_session(self) -> None:
         """断开连接 / 关闭窗口时，把整个会话汇成一条日志写入共享 log 目录。
 
         写日志为尽力而为：任何异常都被吞掉，绝不影响主业务流程。
         """
-        s = self._session
-        if not s:
-            return
-        try:
-            write_session_log(
-                host=s["host"],
-                share=s["share"],
-                operator=s["operator"],
-                account=s["account"],
-                start_dt=s["start"],
-                end_dt=datetime.now(),
-                server_unc=s["server_unc"],
-                subfolder=s["subfolder"],
-                ops=s["ops"],
-                app_version=f"{APP_NAME} v{VERSION}",
-            )
-        except Exception:
-            pass
-        finally:
-            self._session = None
+        self._rec.flush()
     def _active_profile(self) -> ServerProfile | None:
         for s in self.servers:
             if s.id == self.current_id:
@@ -542,16 +525,12 @@ class Api:
                 return
             self.connected = True
             # 建立本次连接会话的审计记录（断开 / 关闭窗口时落盘为一条日志）
-            self._session = {
-                "start": datetime.now(),
-                "operator": self.cm.operator,
-                "account": self._windows_account(),
-                "host": self.cfg.host,
-                "share": self.cfg.share,
-                "server_unc": self.cfg.unc_base,
-                "subfolder": self.cfg.subfolder,
-                "ops": [],
-            }
+            self._rec.begin(
+                host=self.cfg.host,
+                share=self.cfg.share,
+                server_unc=self.cfg.unc_base,
+                subfolder=self.cfg.subfolder,
+            )
             self._call("onStatus", "已连接", "success")
             self._call("onConfigStatus", "已连接", True)
             items = list_files(progress, cancel, self.cfg.root_path)

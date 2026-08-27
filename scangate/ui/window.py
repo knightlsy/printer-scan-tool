@@ -11,15 +11,17 @@
 """
 
 import ctypes
+import getpass
 import customtkinter as ctk
 from tkinter import filedialog
-from PIL import Image, ImageFilter
+from PIL import Image
 
 from scangate.config import ConfigManager, ConnectionConfig, APP_NAME, VERSION
 from scangate.core.worker import WorkerPool, Cancelled
 from scangate.services.connection import connect, disconnect
 from scangate.services.files import list_files, upload, download, delete
 from scangate.services.preview import make_preview
+from scangate.services.session import SessionRecorder
 from scangate.ui.panels import ConnectionPanel, FilePanel, PreviewPanel
 from scangate.ui.overlay import ProgressOverlay
 from scangate.ui.dialogs import AboutDialog, popup, confirm
@@ -61,6 +63,13 @@ class ScanGateApp(ctk.CTk):
         self.config = ConnectionConfig.from_profile(self.cfg_mgr.active())
         self.connected = False
         self._current_items: list[dict] = []
+        # 连接会话审计记录器（连接时 begin，断开/关闭时 flush）
+        _user = getpass.getuser()
+        self._rec = SessionRecorder(
+            operator=self.cfg_mgr.operator,
+            account=_user,
+            app_version=f"{APP_NAME} v{VERSION}",
+        )
 
         self.workers = WorkerPool(self)
 
@@ -426,6 +435,13 @@ class ScanGateApp(ctk.CTk):
         def done(_ok):
             self.overlay.hide()
             self.connected = True
+            # 建立本次连接会话的审计记录（断开 / 关闭窗口时落盘为一条日志）
+            self._rec.begin(
+                host=self.config.host,
+                share=self.config.share,
+                server_unc=self.config.unc_base,
+                subfolder=self.config.subfolder,
+            )
             self.conn_panel.set_status("已连接", connected=True)
             self._set_status("已连接", SUCCESS)
             self._on_refresh()
@@ -446,6 +462,8 @@ class ScanGateApp(ctk.CTk):
 
         def done(_):
             self.overlay.hide()
+            # 断开前先把本次会话审计落盘（此时共享会话仍在，能写进共享 log 目录）
+            self._rec.flush()
             self.connected = False
             self.conn_panel.set_status("未连接")
             self._set_status("已断开", SUCCESS)
@@ -542,6 +560,13 @@ class ScanGateApp(ctk.CTk):
         def done(_r):
             self.overlay.hide()
             self._set_status(f"上传完成：成功 {results['ok']} / 失败 {results['fail']}", SUCCESS)
+            self._rec.record(
+                "上传文件",
+                f"向共享目录 {dest_dir} 上传了 {results['ok']} 个文件（失败 {results['fail']} 个）",
+                target=dest_dir,
+                after_state=f"上传成功 {results['ok']} 个，失败 {results['fail']} 个",
+                success=results["fail"] == 0,
+            )
             self._on_refresh()
 
         def err(e):
@@ -573,6 +598,13 @@ class ScanGateApp(ctk.CTk):
         def done(_):
             self.overlay.hide()
             self._set_status("下载完成", SUCCESS)
+            self._rec.record(
+                "下载文件",
+                f"将共享文件 {item['name']} 下载到本机",
+                target=item["path"],
+                after_state=f"已下载到本机：{dest}",
+                success=True,
+            )
 
         def err(e):
             self.overlay.hide()
@@ -596,6 +628,13 @@ class ScanGateApp(ctk.CTk):
 
         def done(_):
             self.overlay.hide()
+            self._rec.record(
+                "删除文件",
+                f"删除共享文件 {item['name']}",
+                target=item["path"],
+                after_state=f"已删除：{item['path']}",
+                success=True,
+            )
             self._on_refresh()
 
         def err(e):
@@ -609,4 +648,6 @@ class ScanGateApp(ctk.CTk):
         AboutDialog(self)
 
     def _on_close(self):
+        # 关闭前把未落盘的会话审计写入（若仍连接着）
+        self._rec.flush()
         self.destroy()

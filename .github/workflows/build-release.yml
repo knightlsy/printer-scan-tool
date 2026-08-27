@@ -1,0 +1,137 @@
+name: build-release
+
+# 触发：推送 v* 标签（如 v4.8.0）或手动运行（workflow_dispatch，可指定版本号）
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（不带 v，如 4.8.0）。留空则从最新 tag 读取'
+        required: false
+        type: string
+
+env:
+  PYTHON_VERSION: '3.12'
+  DIST_DIR: dist/PrinterScanTool
+  ZIP_NAME: printer-scan-tool.zip
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 缓存 pip 依赖
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: PyInstaller 构建（onedir）
+        run: |
+          pyinstaller main.spec --noconfirm
+
+      - name: 压缩为分发 zip
+        shell: pwsh
+        run: |
+          # onedir 目录 → printer-scan-tool.zip（安装器依赖此目录结构）
+          Compress-Archive -Path "${{ env.DIST_DIR }}\*" -DestinationPath "${{ env.ZIP_NAME }}" -Force
+          Write-Host "打包完成，大小：$((Get-Item ${{ env.ZIP_NAME }}).Length / 1MB) MB"
+
+      - name: 计算 SHA256
+        id: sha
+        shell: pwsh
+        run: |
+          $hash = Get-FileHash "${{ env.ZIP_NAME }}" -Algorithm SHA256
+          Write-Host "sha256=$($hash.Hash.ToLower())"
+          "sha256=$($hash.Hash.ToLower())" >> $env:GITHUB_OUTPUT
+
+      - name: 确定版本号
+        id: version
+        shell: pwsh
+        run: |
+          # 手动运行时用输入版本号，否则从 tag 提取（v4.8.0 → 4.8.0）
+          $v = "${{ github.event.inputs.version }}"
+          if (-not $v) {
+            $v = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          }
+          if (-not $v) { $v = "0.0.0" }
+          Write-Host "version=$v"
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "tag=v$v" >> $env:GITHUB_OUTPUT
+
+      - name: 生成 version.json（清单源）
+        shell: pwsh
+        run: |
+          $ver = "${{ steps.version.outputs.version }}"
+          $sha = "${{ steps.sha.outputs.sha256 }}"
+          $owner = "${{ github.repository_owner }}"
+          $repo = "${{ github.event.repository.name }}"
+          $json = @{
+            version = $ver
+            channel = "stable"
+            published_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.ffffffZ")
+            notes = "自动构建：onedir 打包，Defender 兼容"
+            min_version = ""
+            force = $false
+            files = @(
+              @{
+                name = "printer-scan-tool.zip"
+                size = (Get-Item "printer-scan-tool.zip").Length
+                sha256 = $sha
+                target = "self"
+                url = "https://github.com/$owner/$repo/releases/download/v$ver/printer-scan-tool.zip"
+                urls = @(
+                  "https://ghproxy.net/https://github.com/$owner/$repo/releases/download/v$ver/printer-scan-tool.zip",
+                  "https://mirror.ghproxy.com/https://github.com/$owner/$repo/releases/download/v$ver/printer-scan-tool.zip",
+                  "https://github.com/$owner/$repo/releases/download/v$ver/printer-scan-tool.zip"
+                )
+              }
+            )
+          }
+          $json | ConvertTo-Json -Depth 5 | Set-Content -Path "version.json" -Encoding UTF8
+          Write-Host "version.json 已生成"
+
+      - name: 提交并推送 version.json
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.json
+          $dirty = git status --porcelain
+          if ($dirty) {
+            git commit -m "release v${{ steps.version.outputs.version }}: 更新 version.json"
+            git push origin ${{ github.ref }}
+          } else {
+            Write-Host "version.json 无改动，跳过提交"
+          }
+
+      - name: 创建 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "SCAN.GATE v${{ steps.version.outputs.version }}"
+          body: |
+            ## SCAN.GATE v${{ steps.version.outputs.version }}
+
+            自动构建发布（onedir 打包）。
+          files: ${{ env.ZIP_NAME }}
+          generate_release_notes: false
