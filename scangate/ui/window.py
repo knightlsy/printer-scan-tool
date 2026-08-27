@@ -14,7 +14,7 @@ import ctypes
 import getpass
 import customtkinter as ctk
 from tkinter import filedialog
-from PIL import Image, ImageFilter
+from PIL import Image
 
 from scangate.config import ConfigManager, ConnectionConfig, APP_NAME, VERSION
 from scangate.core.worker import WorkerPool, Cancelled

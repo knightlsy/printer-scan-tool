@@ -21,16 +21,18 @@ def list_files(progress: Callable, cancel, root: str) -> list[dict]:
                     raise InterruptedError()
                 try:
                     st = entry.stat()
+                    is_dir = entry.is_dir()
                     items.append(
                         {
                             "name": entry.name,
-                            "is_dir": entry.is_dir(),
-                            "size": st.st_size if entry.is_file() else 0,
+                            "is_dir": is_dir,
+                            "size": st.st_size if not is_dir else 0,
                             "mtime": st.st_mtime,
                             "path": entry.path,
                         }
                     )
-                except Exception:
+                except OSError:
+                    # 条目可能已被并发删除 / 无权限读取，跳过即可（与原行为一致）
                     pass
     except FileNotFoundError:
         raise
