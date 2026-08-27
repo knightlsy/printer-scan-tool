@@ -67,21 +67,23 @@ jobs:
         run: |
           cd src-tauri
           $env:RUST_BACKTRACE = "0"
-          # 运行 cargo check，输出同时去终端和文件
+          # 捕获 cargo check 输出（子表达式保留 LASTEXITCODE）
           $result = & cargo check 2>&1
           $rc = $LASTEXITCODE
           # 写入文件
           $result | Out-File -FilePath ../rust-check.log -Encoding UTF8
-          # 写进 step summary
+          # 写进 step summary（完整）
           $result | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding UTF8
-          # 输出最后 80 行到终端（CI log 可见）
-          $result | Select-Object -Last 80 | ForEach-Object { Write-Output $_ }
+          # 输出最后 100 行到终端（CI log 可见）
+          $result | Select-Object -Last 100 | ForEach-Object { Write-Output $_ }
           if ($rc -ne 0) {
-            # 抽错误行发 annotation
-            $errs = ($result | Select-String "error\[|error:|--->") | Select-Object -Last 50
-            $errs | ForEach-Object {
-              $s = $_.Line.Substring(0,[Math]::Min($_.Line.Length,500))
-              Write-Output "::error::$s"
+            # 遍历所有行，挑 error 行发 annotation
+            foreach ($line in $result) {
+              $l = [string]$line
+              if ($l -match "error\[" -or $l -match "error:" -or $l -match "--->") {
+                $s = $l.Substring(0,[Math]::Min($l.Length,500))
+                Write-Output "::error::$s"
+              }
             }
             exit 1
           }
