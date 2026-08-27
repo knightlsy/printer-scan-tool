@@ -1,22 +1,22 @@
 {
-  "notes": "自动构建：onedir 打包，Defender 兼容",
-  "version": "4.8.2",
   "files": [
     {
-      "size": 76218000,
+      "size": 76216316,
       "target": "self",
-      "sha256": "ea15d2bb218a0297216ba6bab9ca4304e26456d2c2240bcaa8a47a06916fdb5f",
+      "name": "printer-scan-tool.zip",
       "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.2/printer-scan-tool.zip",
       "urls": [
         "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.2/printer-scan-tool.zip",
         "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.2/printer-scan-tool.zip",
         "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.2/printer-scan-tool.zip"
       ],
-      "name": "printer-scan-tool.zip"
+      "sha256": "3329dbd39d07d846bc8786eb1b1cfcff28ed54993101964c29733f7b2ae9b744"
     }
   ],
-  "published_at": "2026-08-27T08:38:45.298126Z",
-  "channel": "stable",
   "force": false,
-  "min_version": ""
+  "channel": "stable",
+  "published_at": "2026-08-27T08:58:57.957801Z",
+  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "min_version": "",
+  "version": "4.8.2"
 }
