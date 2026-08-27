@@ -1,22 +1,22 @@
 {
-  "channel": "stable",
-  "force": false,
   "files": [
     {
-      "target": "self",
-      "urls": [
-        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.13/printer-scan-tool.zip",
-        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.13/printer-scan-tool.zip",
-        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.13/printer-scan-tool.zip"
-      ],
-      "size": 76219362,
+      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.14/printer-scan-tool.zip",
       "name": "printer-scan-tool.zip",
-      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.13/printer-scan-tool.zip",
-      "sha256": "778aea32a83a7e9db970d4219f57edf148f5c688988c73a1c5d1b6670012539a"
+      "sha256": "ee708e8f53c9bef602e2cf2a4e12b81994bd76877621f88c5a6493b8c40cd881",
+      "urls": [
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.14/printer-scan-tool.zip",
+        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.14/printer-scan-tool.zip",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.14/printer-scan-tool.zip"
+      ],
+      "target": "self",
+      "size": 76220540
     }
   ],
-  "version": "4.8.13",
+  "version": "4.8.14",
+  "channel": "stable",
+  "force": false,
+  "min_version": "",
   "notes": "自动构建：onedir 打包，Defender 兼容",
-  "published_at": "2026-08-27T11:42:14.766100Z",
-  "min_version": ""
+  "published_at": "2026-08-27T14:02:21.847063Z"
 }
