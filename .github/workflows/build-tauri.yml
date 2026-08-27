@@ -65,28 +65,14 @@ jobs:
       - name: 验证 Rust 编译（cargo check，不链接）
         shell: pwsh
         run: |
-          cd src-tauri
-          $env:RUST_BACKTRACE = "0"
-          # 捕获 cargo check 输出（子表达式保留 LASTEXITCODE）
-          $result = & cargo check 2>&1
-          $rc = $LASTEXITCODE
-          # 写入文件
-          $result | Out-File -FilePath ../rust-check.log -Encoding UTF8
-          # 写进 step summary（完整）
-          $result | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding UTF8
-          # 输出最后 100 行到终端（CI log 可见）
-          $result | Select-Object -Last 100 | ForEach-Object { Write-Output $_ }
-          if ($rc -ne 0) {
-            # $result 在 PowerShell 里是单个 String，必须 -split "\n" 拆行
-            $lines = $result -split "`n"
-            foreach ($line in $lines) {
-              if ($line -match "error\[" -or $line -match "error:" -or $line -match "--->") {
-                $s = $line.Substring(0,[Math]::Min($line.Length,500))
-                Write-Output "::error::$s"
-              }
-            }
+          cd ${{ github.workspace }}
+          # 用 Python 脚本跑 cargo check，逐行输出 ::error annotation
+          python3 .github/scripts/cargo_check_with_annotations.py
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "cargo check 失败 ❌"
             exit 1
           }
+          Write-Host "cargo check 通过 ✅"
 
       - name: 上传诊断日志
         uses: actions/upload-artifact@v4
