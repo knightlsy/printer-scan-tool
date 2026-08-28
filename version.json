@@ -1,6 +1,6 @@
 {
   "min_version": "",
-  "version": "4.8.23",
+  "version": "v4.8.25",
   "force": false,
   "channel": "stable",
   "files": [
@@ -17,6 +17,6 @@
       "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip"
     }
   ],
-  "published_at": "2026-08-28T03:34:41.971824Z",
-  "notes": "自动构建：onedir 打包，Defender 兼容"
+  "published_at": "2026-08-28T03:55:00Z",
+  "notes": "修复：icon.ico 被 .gitignore 排除，CI 找不到图标文件"
 }
