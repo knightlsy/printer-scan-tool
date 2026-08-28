@@ -1,22 +1,22 @@
 {
-  "version": "v4.8.30",
-  "notes": "修复：用 png crate 编码 ImageBuffer（image 0.25 不提供 encode_png）",
-  "min_version": "",
-  "published_at": "2026-08-28T05:20:00Z",
-  "force": false,
   "channel": "stable",
+  "version": "4.8.29",
+  "published_at": "2026-08-28T05:17:05.996310Z",
+  "min_version": "",
+  "force": false,
+  "notes": "自动构建：onedir 打包，Defender 兼容",
   "files": [
     {
-      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.28/printer-scan-tool.zip",
-      "size": 76219181,
-      "sha256": "02ded1ee3f7b255ded5a0e9bfc75d8ed259cd82c56aa0f77b879e68535f37d2f",
+      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip",
+      "sha256": "0b82c4a38db190ffa6195afa86aeeb7cd3f40baf12ab08ae2da2d5a8eb9c4444",
       "name": "printer-scan-tool.zip",
       "target": "self",
       "urls": [
-        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.28/printer-scan-tool.zip",
-        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.28/printer-scan-tool.zip",
-        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.28/printer-scan-tool.zip"
-      ]
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip",
+        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip"
+      ],
+      "size": 76219052
     }
   ]
 }
