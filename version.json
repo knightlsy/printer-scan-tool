@@ -1,22 +1,22 @@
 {
   "channel": "stable",
-  "version": "v4.8.31",
-  "published_at": "2026-08-28T05:35:00Z",
-  "min_version": "",
   "force": false,
-  "notes": "修复：npx tauri → npx @tauri-apps/cli（Tauri v2 CLI 包名）",
+  "published_at": "2026-08-28T05:28:47.459197Z",
   "files": [
     {
-      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip",
-      "sha256": "0b82c4a38db190ffa6195afa86aeeb7cd3f40baf12ab08ae2da2d5a8eb9c4444",
-      "name": "printer-scan-tool.zip",
       "target": "self",
       "urls": [
-        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip",
-        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip",
-        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip"
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.30/printer-scan-tool.zip",
+        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.30/printer-scan-tool.zip",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.30/printer-scan-tool.zip"
       ],
-      "size": 76219052
+      "name": "printer-scan-tool.zip",
+      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.30/printer-scan-tool.zip",
+      "size": 76219781,
+      "sha256": "4a8d34e4656dc332a325699a35954c2c9dcdf85125d99dda499e882ee1f5c5d5"
     }
-  ]
+  ],
+  "version": "4.8.30",
+  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "min_version": ""
 }
