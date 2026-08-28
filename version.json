@@ -1,9 +1,9 @@
 {
-  "published_at": "2026-08-28T03:28:39.904295Z",
-  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "published_at": "2026-08-28T03:40:00Z",
+  "notes": "P0 ponytail 清理 + tauri-build 修复（package.metadata + icon.ico）",
   "min_version": "",
   "channel": "stable",
-  "version": "4.8.23",
+  "version": "v4.8.24",
   "force": false,
   "files": [
     {
