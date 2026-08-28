@@ -39,6 +39,8 @@ rusqlite = { version = "0.32", features = ["bundled"] }
 reqwest = { version = "0.12", features = ["json", "blocking"] }
 # ============ PDF 预览 (pdfium) ============
 pdfium-render = "0.8"
+# ============ PNG 编码 ============
+png = "0.17"
 # ============ 日志 ============
 # ============ 打开外部链接（用 std::process::Command 原生实现，无额外依赖） ============
 

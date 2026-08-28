@@ -1,8 +1,8 @@
 {
-  "version": "4.8.28",
-  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "version": "v4.8.30",
+  "notes": "修复：用 png crate 编码 ImageBuffer（image 0.25 不提供 encode_png）",
   "min_version": "",
-  "published_at": "2026-08-28T05:08:51.583887Z",
+  "published_at": "2026-08-28T05:20:00Z",
   "force": false,
   "channel": "stable",
   "files": [

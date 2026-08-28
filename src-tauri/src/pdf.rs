@@ -81,8 +81,17 @@ fn render_pdf_page(
         .render_with_config(&pdfium_render::prelude::PdfRenderConfig::default().set_target_width(560))
         .map_err(|e| format!("渲染失败: {e}"))?;
     let img = bitmap.as_image().into_rgb8();
-    let png = img.encode_png()
-        .map_err(|e| format!("编码失败: {e}"))?;
+    let mut png_buf = Vec::new();
+    {
+        let encoder = png::Encoder::new(&mut png_buf, img.width(), img.height());
+        let mut writer = encoder
+            .write_header()
+            .map_err(|e| format!("PNG header 失败: {e}"))?;
+        writer
+            .write_image_data(img.as_raw())
+            .map_err(|e| format!("PNG 写入失败: {e}"))?;
+    }
+    let png = png_buf;
 
     let data_url = format!("data:image/png;base64,{}", base64_encode(&png));
     Ok(crate::commands::PreviewResult {
