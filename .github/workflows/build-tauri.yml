@@ -88,8 +88,8 @@ jobs:
         shell: pwsh
         run: |
           cd src-tauri
-          # Tauri CLI
-          npx tauri build --target ${{ matrix.target }}
+          # Tauri CLI (v2 = @tauri-apps/cli)
+          npx @tauri-apps/cli build --target ${{ matrix.target }}
         env:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}

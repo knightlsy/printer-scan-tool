@@ -1,10 +1,10 @@
 {
   "channel": "stable",
-  "version": "4.8.29",
-  "published_at": "2026-08-28T05:17:05.996310Z",
+  "version": "v4.8.31",
+  "published_at": "2026-08-28T05:35:00Z",
   "min_version": "",
   "force": false,
-  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "notes": "修复：npx tauri → npx @tauri-apps/cli（Tauri v2 CLI 包名）",
   "files": [
     {
       "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.29/printer-scan-tool.zip",
