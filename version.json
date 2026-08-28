@@ -1,7 +1,7 @@
 {
   "channel": "stable",
-  "version": "4.8.21",
-  "published_at": "2026-08-27T15:32:04.632787Z",
+  "version": "v4.8.22",
+  "published_at": "2026-08-28T01:15:00Z",
   "files": [
     {
       "urls": [
@@ -18,5 +18,5 @@
   ],
   "force": false,
   "min_version": "",
-  "notes": "自动构建：onedir 打包，Defender 兼容"
+  "notes": "P0 ponytail 清理：删除无用依赖(log/env_logger/windows-sys/open)、死代码(Rect/get_window_rect)、stdlib 替换(which→split_paths)"
 }
