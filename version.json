@@ -1,22 +1,22 @@
 {
-  "published_at": "2026-08-28T03:40:00Z",
-  "notes": "P0 ponytail 清理 + tauri-build 修复（package.metadata + icon.ico）",
   "min_version": "",
-  "channel": "stable",
-  "version": "v4.8.24",
+  "version": "4.8.23",
   "force": false,
+  "channel": "stable",
   "files": [
     {
-      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip",
       "urls": [
         "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip",
         "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip",
         "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip"
       ],
-      "target": "self",
+      "size": 76218592,
+      "sha256": "1eb13882e2cbe0e342eeac6b37a3b6c511a3cef5dcbc9c9a811d51f4bab805c2",
       "name": "printer-scan-tool.zip",
-      "size": 76220585,
-      "sha256": "b9eec36da88531eb4346e001237e75bd4a10c247af2512d9ad33110b080b6070"
+      "target": "self",
+      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip"
     }
-  ]
+  ],
+  "published_at": "2026-08-28T03:34:41.971824Z",
+  "notes": "自动构建：onedir 打包，Defender 兼容"
 }
