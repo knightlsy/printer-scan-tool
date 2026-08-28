@@ -1,22 +1,22 @@
 {
+  "published_at": "2026-08-28T03:28:39.904295Z",
+  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "min_version": "",
   "channel": "stable",
-  "version": "v4.8.22",
-  "published_at": "2026-08-28T01:15:00Z",
+  "version": "4.8.23",
+  "force": false,
   "files": [
     {
+      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip",
       "urls": [
-        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.21/printer-scan-tool.zip",
-        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.21/printer-scan-tool.zip",
-        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.21/printer-scan-tool.zip"
+        "https://ghproxy.net/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip",
+        "https://mirror.ghproxy.com/https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip",
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.23/printer-scan-tool.zip"
       ],
-      "sha256": "d5ea2b577d26e260567d20d8f6308e4d8995f203ec070c626e56f04bc3ce315f",
-      "size": 76218636,
-      "url": "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.21/printer-scan-tool.zip",
       "target": "self",
-      "name": "printer-scan-tool.zip"
+      "name": "printer-scan-tool.zip",
+      "size": 76220585,
+      "sha256": "b9eec36da88531eb4346e001237e75bd4a10c247af2512d9ad33110b080b6070"
     }
-  ],
-  "force": false,
-  "min_version": "",
-  "notes": "P0 ponytail 清理：删除无用依赖(log/env_logger/windows-sys/open)、死代码(Rect/get_window_rect)、stdlib 替换(which→split_paths)"
+  ]
 }
