@@ -80,11 +80,8 @@ fn render_pdf_page(
     let bitmap = page_handle
         .render_with_config(&pdfium_render::prelude::PdfRenderConfig::default().set_target_width(560))
         .map_err(|e| format!("渲染失败: {e}"))?;
-    let png = bitmap
-        .as_image()
-        .into_rgb8()
-        .expect("PNG 编码失败")
-        .encode_png()
+    let img = bitmap.as_image().into_rgb8();
+    let png = img.encode_png()
         .map_err(|e| format!("编码失败: {e}"))?;
 
     let data_url = format!("data:image/png;base64,{}", base64_encode(&png));

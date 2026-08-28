@@ -627,11 +627,12 @@ pub fn resize_window(window: Window, width: f64, height: f64, _direction: String
 
 #[tauri::command]
 pub fn cancel(state: State<Mutex<AppState>>, task_id: String) {
-    let flag = {
-        let st = state.lock().unwrap();
-        st.cancels.lock().unwrap().get(&task_id).cloned()
-    };
-    if let Some(f) = flag {
+    let cancels = state.lock().unwrap();
+    let map = cancels.cancels.lock().unwrap();
+    let found = map.get(&task_id).cloned();
+    drop(map);
+    drop(cancels);
+    if let Some(f) = found {
         f.store(true, Ordering::Relaxed);
     }
 }
