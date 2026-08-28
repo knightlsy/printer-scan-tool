@@ -599,21 +599,22 @@ pub fn close_window(app: AppHandle) {
 
 #[tauri::command]
 pub fn open_url(url: String) {
-    let _ = open::that_detached(&url);
-}
-
-#[derive(serde::Serialize, Default)]
-pub struct Rect {
-    pub x: i32,
-    pub y: i32,
-    pub width: i32,
-    pub height: i32,
-}
-
-#[tauri::command]
-pub fn get_window_rect(window: Window) -> Rect {
-    let _ = window;
-    Rect::default()
+    #[cfg(windows)]
+    {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", &url])
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn();
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = std::process::Command::new("xdg-open")
+            .arg(&url)
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn();
+    }
 }
 
 #[tauri::command]

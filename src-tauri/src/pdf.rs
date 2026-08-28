@@ -167,31 +167,19 @@ pub fn compress(
 
 fn find_ghostscript() -> Option<String> {
     for name in ["gswin64c.exe", "gswin32c.exe", "gs"] {
-        if let Ok(path) = which(name) {
-            return Some(path);
+        if let Some(p) = std::env::split_paths(&std::env::var("PATH").unwrap_or_default())
+            .map(|d| d.join(name))
+            .find(|p| p.exists())
+        {
+            return Some(p.to_string_lossy().to_string());
         }
     }
-    // 常见安装路径
-    for p in [
-        r"C:\Program Files\gs\gswin64c.exe",
-        r"C:\Program Files (x86)\gs\gswin64c.exe",
-    ] {
+    for p in [r"C:\Program Files\gs\gswin64c.exe", r"C:\Program Files (x86)\gs\gswin64c.exe"] {
         if std::path::Path::new(p).exists() {
             return Some(p.to_string());
         }
     }
     None
-}
-
-fn which(name: &str) -> Result<String, ()> {
-    let path = std::env::var("PATH").unwrap_or_default();
-    for dir in path.split(';') {
-        let full = std::path::Path::new(&dir).join(name);
-        if full.exists() {
-            return Ok(full.to_string_lossy().to_string());
-        }
-    }
-    Err(())
 }
 
 /// 标准库 base64 编码（避免额外依赖冲突）。
