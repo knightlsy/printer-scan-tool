@@ -13,10 +13,10 @@
       "sha256": "e92e7ac9261ced5b752c10699f01e3628eb3b9d1b71c78173541e3dd12a6ca5b"
     }
   ],
-  "published_at": "2026-08-28T04:13:01.441291Z",
-  "version": "4.8.25",
+  "published_at": "2026-08-28T04:35:00Z",
+  "version": "v4.8.27",
   "min_version": "",
   "force": false,
-  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "notes": "修复 12 个 Rust 编译错误",
   "channel": "stable"
 }

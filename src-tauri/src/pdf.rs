@@ -72,10 +72,13 @@ fn render_pdf_page(
             pdf: true,
         });
     }
-    let idx = page.min(total.saturating_sub(1));
-    let page_handle = pdf.pages().get(idx).ok_or("渲染页面失败")?;
+    let idx = page.min(total.saturating_sub(1)) as u16;
+    let page_handle = match pdf.pages().get(idx) {
+        Ok(p) => p,
+        Err(_) => return Err("渲染页面失败".into()),
+    };
     let bitmap = page_handle
-        .render_with_config(&pdfium_render::prelude::RenderConfig::default().set_target_width(560))
+        .render_with_config(&pdfium_render::prelude::PdfRenderConfig::default().set_target_width(560))
         .map_err(|e| format!("渲染失败: {e}"))?;
     let png = bitmap
         .as_image()

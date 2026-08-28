@@ -73,13 +73,12 @@ pub fn connect(app: AppHandle, state: State<Mutex<AppState>>) -> Result<(), Stri
         let items = crate::smb::list_files(&cfg2, &flag2);
         drop_cancel(&state.lock().unwrap(), "list");
         if let Ok(items) = items {
-            emit(&app, "onList", &items).ok();
+            emit(&app, "onList", &items);
             emit(
                 &app,
                 "onStatus",
                 &serde_json::json!({"text": format!("共 {} 项", items.len()), "kind": "success"}),
-            )
-            .ok();
+            );
         }
     }
     let _ = app;
@@ -172,7 +171,7 @@ pub fn use_server(app: AppHandle, state: State<Mutex<AppState>>, id: String) -> 
     }
     *st.current_id.lock().unwrap() = id.clone();
     crate::db::save_meta(&conn, "current_id", &id).map_err(|e| e.to_string())?;
-    emit(&app, "useServer", &serde_json::json!({"id": id})).ok();
+    emit(&app, "useServer", &serde_json::json!({"id": id}));
     Ok(())
 }
 
@@ -213,7 +212,7 @@ pub fn set_operator(state: State<Mutex<AppState>>, name: String) -> serde_json::
         crate::db::save_meta(&conn, "operator", &name)
     })() {
         Ok(()) => serde_json::json!({"ok": true}),
-        Err(e) => serde_json::json!({"ok": false, "error": e}),
+        Err(e) => serde_json::json!({"ok": false, "error": e.to_string()}),
     }
 }
 
@@ -250,6 +249,8 @@ pub fn get_init(state: State<Mutex<AppState>>) -> InitData {
     let op = st.operator.lock().unwrap().clone();
     let connected = *st.connected.lock().unwrap();
     let profile = st.active_profile();
+    let cur_id = st.current_id.lock().unwrap().clone();
+    drop(st);
     InitData {
         app_name: "SCAN.GATE".into(),
         version: env!("CARGO_PKG_VERSION").into(),
@@ -263,7 +264,7 @@ pub fn get_init(state: State<Mutex<AppState>>) -> InitData {
             username: profile.username,
             password: profile.password,
         },
-        current_id: st.current_id.lock().unwrap().clone(),
+        current_id: cur_id,
         update: UpdateView {
             auto_check: true,
             auto_install: false,
@@ -626,9 +627,11 @@ pub fn resize_window(window: Window, width: f64, height: f64, _direction: String
 
 #[tauri::command]
 pub fn cancel(state: State<Mutex<AppState>>, task_id: String) {
-    let st = state.lock().unwrap();
-    if let Some(flag) = st.cancels.lock().unwrap().get(&task_id) {
-        flag.store(true, Ordering::Relaxed);
+    {
+        let st = state.lock().unwrap();
+        if let Some(flag) = st.cancels.lock().unwrap().get(&task_id) {
+            flag.store(true, Ordering::Relaxed);
+        }
     }
 }
 

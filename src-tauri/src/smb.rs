@@ -131,9 +131,10 @@ pub fn list_files(
             size: if is_dir {
                 0
             } else {
-                meta.map(|m| m.len()).unwrap_or(0)
+                meta.as_ref().map(|m| m.len()).unwrap_or(0)
             },
             mtime: meta
+                .as_ref()
                 .and_then(|m| m.modified().ok())
                 .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
                 .map(|d| d.as_secs() as f64)

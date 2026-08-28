@@ -1,5 +1,5 @@
 use std::sync::Mutex;
-use tauri::{Builder, Manager};
+use tauri::Builder;
 
 mod audit;
 mod commands;
@@ -48,7 +48,6 @@ pub fn run() {
             commands::toggle_maximize,
             commands::close_window,
             commands::open_url,
-            commands::get_window_rect,
             commands::resize_window,
             // 其他
             commands::cancel,
