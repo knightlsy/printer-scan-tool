@@ -82,7 +82,7 @@ fn render_pdf_page(
         .map_err(|e| format!("渲染失败: {e}"))?;
     let png = bitmap
         .as_image()
-        .into_rgba()
+        .into_rgb8()
         .expect("PNG 编码失败")
         .encode_png()
         .map_err(|e| format!("编码失败: {e}"))?;
@@ -90,7 +90,7 @@ fn render_pdf_page(
     let data_url = format!("data:image/png;base64,{}", base64_encode(&png));
     Ok(crate::commands::PreviewResult {
         image: Some(data_url),
-        page: idx,
+        page: idx as u32,
         total,
         pdf: true,
     })
