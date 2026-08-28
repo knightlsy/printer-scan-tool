@@ -4,22 +4,22 @@ import subprocess, sys, os
 log_path = os.path.join(os.environ.get("WORKSPACE", "."), "rust-check.log")
 summary_path = os.environ.get("GITHUB_STEP_SUMMARY", "")
 
-# 运行 cargo check，捕获 stdout/stderr
+# 运行 cargo check（二进制模式，手动 utf-8 解码，避免 Windows cp1252 处理中文报错崩溃）
 proc = subprocess.Popen(
     ["cargo", "check"],
     cwd="src-tauri",
     stdout=subprocess.PIPE,
     stderr=subprocess.STDOUT,
-    text=True,
     bufsize=1,
 )
 
 lines = []
-for line in proc.stdout:
-    line = line.rstrip("\n")
+for raw in proc.stdout:
+    line = raw.decode("utf-8", errors="replace").rstrip("\n")
     lines.append(line)
-    # 逐行输出到 stdout（GitHub workflow command 从这里读取）
-    print(line, flush=True)
+    # 写入 stdout（GitHub workflow command 从这里读取；用 bytes 避免 Windows cp1252 编码报错）
+    sys.stdout.buffer.write((line + "\n").encode("utf-8"))
+    sys.stdout.buffer.flush()
 
 proc.wait()
 rc = proc.returncode
@@ -40,20 +40,18 @@ if rc != 0:
     seen = set()
     for line in lines:
         low = line.lower()
-        # 匹配 cargo 错误输出特征
         is_err = (
-            "error[" in low           # error[E0xxx]
-            or "error:" in low         # "error: ..."
-            or "--> " in line          # --> file.rs:123
-            or line.startswith("error")  # 行首 error
+            "error[" in low
+            or "error:" in low
+            or "--> " in line
+            or line.startswith("error")
         )
         if is_err and line not in seen:
             seen.add(line)
-            # 用最简单格式：::error title=...::message
-            # 不指定 file/line，避免格式错误被忽略
             title = "cargo-error"
-            msg = line[:255]  # 限制长度
-            ann = f"::error title={title}::{msg}"
-            print(ann, flush=True)
+            msg = line[:255]
+            ann = f"::error title={title}::{msg}\n"
+            sys.stdout.buffer.write(ann.encode("utf-8"))
+            sys.stdout.buffer.flush()
 
 sys.exit(rc)

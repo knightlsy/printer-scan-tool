@@ -1,5 +1,5 @@
 {
-  "published_at": "2026-08-28T03:50:42.867588Z",
+  "published_at": "2026-08-28T04:20:00Z",
   "channel": "stable",
   "files": [
     {
@@ -16,7 +16,7 @@
     }
   ],
   "min_version": "",
-  "notes": "自动构建：onedir 打包，Defender 兼容",
-  "version": "4.8.24",
+  "notes": "修复：Python 脚本 UnicodeDecodeError（Windows cp1252 无法处理中文 cargo 输出）",
+  "version": "v4.8.26",
   "force": false
 }
