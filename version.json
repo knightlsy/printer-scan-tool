@@ -1,7 +1,7 @@
 {
   "channel": "stable",
   "force": false,
-  "published_at": "2026-08-28T05:28:47.459197Z",
+  "published_at": "2026-08-28T05:55:00Z",
   "files": [
     {
       "target": "self",
@@ -16,7 +16,7 @@
       "sha256": "4a8d34e4656dc332a325699a35954c2c9dcdf85125d99dda499e882ee1f5c5d5"
     }
   ],
-  "version": "4.8.30",
-  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "version": "v4.8.32",
+  "notes": "删除 updater 占位符公钥（tauri.conf.json），解决签名报错",
   "min_version": ""
 }
