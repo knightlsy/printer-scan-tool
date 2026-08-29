@@ -1,6 +1,6 @@
 {
   "force": false,
-  "notes": "自动构建：onedir 打包，Defender 兼容",
+  "notes": "移除 tauri-plugin-updater 依赖（Cargo.toml + lib.rs），解决 bundler 配置报错",
   "min_version": "",
   "channel": "stable",
   "files": [
@@ -17,6 +17,6 @@
       ]
     }
   ],
-  "version": "4.8.31",
-  "published_at": "2026-08-28T05:43:07.674720Z"
+  "version": "v4.8.33",
+  "published_at": "2026-08-29T14:38:00Z"
 }
