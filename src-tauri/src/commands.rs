@@ -714,19 +714,20 @@ pub async fn download_and_install_update(app: AppHandle) -> Result<(), String> {
     let updater = app.updater().map_err(|e| e.to_string())?;
     match updater.check().await {
         Ok(Some(update)) => {
-            let app2 = app.clone();
+            let app_dl = app.clone();
+            let app_done = app.clone();
             let mut downloaded: u64 = 0;
             let _ = app.emit(
                 "onUpdateStatus",
                 &serde_json::json!({"kind": "checking", "text": "开始下载更新…"}),
             );
-            update
+            let bytes = update
                 .download(
                     move |chunk_len: usize, total: Option<u64>| {
                         downloaded = downloaded.saturating_add(chunk_len as u64);
                         if let Some(total) = total {
                             let pct = (downloaded as f64 / total as f64 * 100.0).min(100.0) as u32;
-                            let _ = app2.emit(
+                            let _ = app_dl.emit(
                                 "onUpdateStatus",
                                 &serde_json::json!({
                                     "kind": "downloading",
@@ -735,7 +736,7 @@ pub async fn download_and_install_update(app: AppHandle) -> Result<(), String> {
                                 }),
                             );
                         } else {
-                            let _ = app2.emit(
+                            let _ = app_dl.emit(
                                 "onUpdateStatus",
                                 &serde_json::json!({
                                     "kind": "downloading",
@@ -744,8 +745,8 @@ pub async fn download_and_install_update(app: AppHandle) -> Result<(), String> {
                             );
                         }
                     },
-                    || {
-                        let _ = app2.emit(
+                    move || {
+                        let _ = app_done.emit(
                             "onUpdateStatus",
                             &serde_json::json!({"kind": "downloaded", "text": "下载完成，正在安装…"}),
                         );
@@ -757,7 +758,7 @@ pub async fn download_and_install_update(app: AppHandle) -> Result<(), String> {
                 "onUpdateStatus",
                 &serde_json::json!({"kind": "installing", "text": "下载完成，正在安装…"}),
             );
-            update.install().map_err(|e| e.to_string())?;
+            update.install(bytes).map_err(|e| e.to_string())?;
             let _ = app.emit(
                 "onUpdateStatus",
                 &serde_json::json!({"kind": "updated", "text": "更新完成，应用将重启"}),
