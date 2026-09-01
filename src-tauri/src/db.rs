@@ -147,6 +147,15 @@ pub fn load_meta(conn: &Connection) -> (String, String) {
     (operator, current_id)
 }
 
+pub fn get_meta(conn: &Connection, key: &str) -> String {
+    conn.query_row(
+        "SELECT value FROM meta WHERE key = ?1",
+        params![key],
+        |r| r.get::<_, String>(0),
+    )
+    .unwrap_or_default()
+}
+
 pub fn save_meta(conn: &Connection, key: &str, value: &str) -> rusqlite::Result<()> {
     conn.execute(
         "INSERT INTO meta (key, value) VALUES (?1, ?2)

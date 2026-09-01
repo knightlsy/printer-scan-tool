@@ -1,13 +1,11 @@
 [package]
 name = "scangate"
-version = "4.8.0"
+version = "4.8.32"
 description = "SCAN.GATE 打印机扫描共享工具"
 authors = ["knightlsy"]
 edition = "2021"
 license = "MIT"
 rust-version = "1.88"
-
-[package.metadata]
 
 [lib]
 name = "scangate_lib"

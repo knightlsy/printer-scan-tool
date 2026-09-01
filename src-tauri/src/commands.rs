@@ -623,6 +623,19 @@ pub fn resize_window(window: Window, width: f64, height: f64, _direction: String
     let _ = window.set_size(tauri::PhysicalSize::new(width as u32, height as u32));
 }
 
+/// 返回主窗口当前像素尺寸，供前端八向缩放逻辑同步初始状态。
+#[tauri::command]
+pub fn get_window_rect(window: Window) -> Result<serde_json::Value, String> {
+    let size = window.outer_size().map_err(|e| e.to_string())?;
+    let inner = window.inner_size().map_err(|e| e.to_string())?;
+    Ok(serde_json::json!({
+        "width": size.width,
+        "height": size.height,
+        "innerWidth": inner.width,
+        "innerHeight": inner.height,
+    }))
+}
+
 // ---------------- 取消 / 其它 ----------------
 
 #[tauri::command]
@@ -655,15 +668,119 @@ pub fn about() -> AboutData {
     }
 }
 
-// ---------------- 更新（占位，后续接 tauri-plugin-updater） ----------------
+// ---------------- 更新（接 tauri-plugin-updater） ----------------
+
+/// 检查更新：调用 updater 插件拉取 manifest，发现新版时通过 onUpdateFound 事件推送。
+/// 前端 checkUpdate() 调用时传 false（非静默），由插件自行处理下载/安装进度事件。
 #[tauri::command]
-pub fn check_update() -> Result<serde_json::Value, String> {
-    Ok(serde_json::json!({"has_update": false, "version": env!("CARGO_PKG_VERSION")}))
+pub async fn check_update(app: AppHandle) -> Result<serde_json::Value, String> {
+    use tauri_plugin_updater::UpdaterExt;
+    let updater = app.updater().map_err(|e| e.to_string())?;
+    match updater.check().await {
+        Ok(Some(update)) => {
+            let current = env!("CARGO_PKG_VERSION").to_string();
+            let _ = app.emit(
+                "onUpdateFound",
+                &serde_json::json!({
+                    "version": update.version,
+                    "notes": update.body,
+                    "download_url": update.download_url.to_string(),
+                    "current": current,
+                }),
+            );
+            Ok(serde_json::json!({"has_update": true}))
+        }
+        Ok(None) => {
+            let _ = app.emit(
+                "onUpdateStatus",
+                &serde_json::json!({"kind": "up_to_date", "text": "已是最新版本"}),
+            );
+            Ok(serde_json::json!({"has_update": false}))
+        }
+        Err(e) => {
+            let _ = app.emit(
+                "onUpdateStatus",
+                &serde_json::json!({"kind": "error", "text": format!("检查更新失败：{}", e)}),
+            );
+            Err(e.to_string())
+        }
+    }
 }
+
+/// 下载并安装更新（manifest 含直链时自动完成，否则回退到手动下载页）。
 #[tauri::command]
-pub fn download_and_install_update() -> Result<(), String> {
-    Ok(())
+pub async fn download_and_install_update(app: AppHandle) -> Result<(), String> {
+    use tauri_plugin_updater::UpdaterExt;
+    let updater = app.updater().map_err(|e| e.to_string())?;
+    match updater.check().await {
+        Ok(Some(update)) => {
+            let app2 = app.clone();
+            let mut downloaded: u64 = 0;
+            let _ = app.emit(
+                "onUpdateStatus",
+                &serde_json::json!({"kind": "checking", "text": "开始下载更新…"}),
+            );
+            update
+                .download(
+                    move |chunk_len: usize, total: Option<u64>| {
+                        downloaded = downloaded.saturating_add(chunk_len as u64);
+                        if let Some(total) = total {
+                            let pct = (downloaded as f64 / total as f64 * 100.0).min(100.0) as u32;
+                            let _ = app2.emit(
+                                "onUpdateStatus",
+                                &serde_json::json!({
+                                    "kind": "downloading",
+                                    "text": format!("下载中…{}%", pct),
+                                    "percent": pct,
+                                }),
+                            );
+                        } else {
+                            let _ = app2.emit(
+                                "onUpdateStatus",
+                                &serde_json::json!({
+                                    "kind": "downloading",
+                                    "text": format!("下载中…{}MB", downloaded >> 20),
+                                }),
+                            );
+                        }
+                    },
+                    || {
+                        let _ = app2.emit(
+                            "onUpdateStatus",
+                            &serde_json::json!({"kind": "downloaded", "text": "下载完成，正在安装…"}),
+                        );
+                    },
+                )
+                .await
+                .map_err(|e| e.to_string())?;
+            let _ = app.emit(
+                "onUpdateStatus",
+                &serde_json::json!({"kind": "installing", "text": "下载完成，正在安装…"}),
+            );
+            update.install().map_err(|e| e.to_string())?;
+            let _ = app.emit(
+                "onUpdateStatus",
+                &serde_json::json!({"kind": "updated", "text": "更新完成，应用将重启"}),
+            );
+            Ok(())
+        }
+        Ok(None) => {
+            let _ = app.emit(
+                "onUpdateStatus",
+                &serde_json::json!({"kind": "need_manual", "text": "已是最新版本，无需更新"}),
+            );
+            Ok(())
+        }
+        Err(e) => {
+            let _ = app.emit(
+                "onUpdateStatus",
+                &serde_json::json!({"kind": "error", "text": format!("更新失败：{}", e)}),
+            );
+            Err(e.to_string())
+        }
+    }
 }
+
 #[tauri::command]
 pub fn set_update_prefs(
     _auto_check: Option<bool>,

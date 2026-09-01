@@ -49,6 +49,7 @@ pub fn run() {
             commands::close_window,
             commands::open_url,
             commands::resize_window,
+            commands::get_window_rect,
             // 其他
             commands::cancel,
             commands::about,

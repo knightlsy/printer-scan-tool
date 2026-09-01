@@ -43,6 +43,15 @@
         $(["toolsResult"]).hidden = true;
       }
     });
+    // 监听更新事件：发现新版本 / 状态文本
+    window.__TAURI__.event.listen("onUpdateStatus", function (e) {
+      var p = e.payload;
+      if (p && p.kind !== undefined) window.onUpdateStatus(p.kind, p.text || "");
+    });
+    window.__TAURI__.event.listen("onUpdateFound", function (e) {
+      var p = e.payload;
+      if (p) window.onUpdateFound(p);
+    });
     // 主动触发 pywebviewready，复用初始化逻辑
     window.dispatchEvent(new CustomEvent("pywebviewready"));
   }
@@ -314,6 +323,19 @@
       onStatus(text, "success");
     } else if (kind === "rolledback") {
       onStatus(text, "error");
+    } else if (kind === "downloading") {
+      // 后端推送实时下载进度：text 形如 "下载中…42%"，解析出百分比驱动进度条
+      var m = /(\d+)\s*%/.exec(text || "");
+      var p = m ? Math.max(0, Math.min(100, parseInt(m[1], 10))) : 0;
+      var w = document.getElementById("updProgressWrap");
+      var b = document.getElementById("updBar");
+      var t = document.getElementById("updPct");
+      if (w) w.hidden = false;
+      if (b) b.style.width = p + "%";
+      if (t) t.textContent = p + "%";
+      var st = document.getElementById("updStage");
+      if (st) st.textContent = "下载中";
+      setUpdState(text, "");
     } else {
       setUpdState(text, "");
     }

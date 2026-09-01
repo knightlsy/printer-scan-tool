@@ -1,7 +1,6 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
   "productName": "SCAN.GATE",
-  "version": "4.8.0",
+  "version": "4.8.32",
   "identifier": "cn.knightlsy.scangate",
   "build": {
     "beforeDevCommand": "",
@@ -51,5 +50,25 @@
     }
   },
   "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/knightlsy/printer-scan-tool/releases/download/v4.8.32/version.json"
+      ],
+      "active": true
+    },
+    "shell": {
+      "allow": [
+        {
+          "name": "shell:allow-open",
+          "allow": [
+            {
+              "name": "https://*",
+              "args": true
+            }
+          ]
+        }
+      ]
+    },
+    "dialog": {}
   }
 }
